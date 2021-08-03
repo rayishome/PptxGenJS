@@ -1035,6 +1035,7 @@ export interface OptsChartData {
 	name?: string
 	sizes?: number[]
 	values?: number[]
+	valueLabels?: string[]
 	/**
 	 * Override `chartColors`
 	 */
@@ -1269,6 +1270,7 @@ export interface IChartPropsDataLabel {
 	dataLabelFormatCode?: string
 	dataLabelFormatScatter?: 'custom' | 'customXY' | 'XY'
 	dataLabelPosition?: 'b' | 'bestFit' | 'ctr' | 'l' | 'r' | 't' | 'inEnd' | 'outEnd'
+	dataLabelFormatBar?: 'custom'
 }
 export interface IChartPropsDataTable {
 	dataTableFontSize?: number
