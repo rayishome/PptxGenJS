@@ -1036,11 +1036,17 @@ export interface OptsChartData {
 	sizes?: number[]
 	values?: number[]
 	valueLabels?: string[]
+	valueLabelsProp?: OptsValueLabel[]
 	/**
 	 * Override `chartColors`
 	 */
 	//color?: string // TODO: WIP: (Pull #727)
 }
+export interface OptsValueLabel {
+	superscript?: boolean
+	color?: HexColor
+}
+
 export interface OptsChartGridLine {
 	/**
 	 * Gridline color (hex)

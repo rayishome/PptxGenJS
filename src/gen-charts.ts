@@ -19,7 +19,15 @@ import {
 	LETTERS,
 	ONEPT,
 } from './core-enums'
-import { IChartOptsLib, ISlideRelChart, ShadowProps, OptsChartData, IChartPropsTitle, OptsChartGridLine } from './core-interfaces'
+import {
+	IChartOptsLib,
+	ISlideRelChart,
+	ShadowProps,
+	OptsChartData,
+	IChartPropsTitle,
+	OptsChartGridLine,
+	HexColor
+} from "./core-interfaces";
 import { createColorElement, genXmlColorSelection, convertRotationDegrees, encodeXmlEntities, getMix, getUuid, valToPts } from './gen-utils'
 import JSZip from 'jszip'
 
@@ -893,7 +901,7 @@ function makeChartType(chartType: CHART_NAME, data: OptsChartData[], opts: IChar
 								strXml += '      <a:pPr>'
 								strXml +=
 									'        <a:defRPr b="' + (opts.dataLabelFontBold ? 1 : 0) + '" i="0" strike="noStrike" sz="' + (opts.dataLabelFontSize || DEF_FONT_SIZE) + '00" u="none">'
-								strXml += '          <a:solidFill>' + createColorElement(opts.dataLabelColor || DEF_FONT_COLOR) + '</a:solidFill>'
+								strXml += '          <a:solidFill>' + createColorElement(obj.valueLabelsProp[index]?.color || opts.dataLabelColor || DEF_FONT_COLOR) + '</a:solidFill>'
 								strXml += '          <a:latin typeface="' + (opts.dataLabelFontFace || 'Arial') + '"/>'
 								strXml += '        </a:defRPr>'
 								strXml += '      </a:pPr>'
@@ -901,10 +909,21 @@ function makeChartType(chartType: CHART_NAME, data: OptsChartData[], opts: IChar
 								strXml +='      			<a:rPr lang="'+ (opts.lang || 'en-US') +'" baseline="0"/>';
 								strXml +='          	<a:t>[' + encodeXmlEntities(obj.name) + ']</a:t>';
 								strXml +='        	</a:fld>';
-								strXml +='        	<a:r>';
-								strXml +='        		<a:rPr lang="'+ (opts.lang || 'en-US') +'" dirty="0"/>';
-								strXml +='          	<a:t>'+ ' ' + encodeXmlEntities(obj.valueLabels[index]) +'</a:t>';
-								strXml +='        	</a:r>';
+								if(obj.valueLabelsProp[index]?.superscript) {
+									strXml +='        	<a:r>';
+									strXml +='        		<a:rPr lang="'+ (opts.lang || 'en-US') +'" dirty="0"/>';
+									strXml +='          	<a:t></a:t>';
+									strXml +='        	</a:r>';
+									strXml +='        	<a:r>';
+									strXml +='        		<a:rPr lang="'+ (opts.lang || 'en-US') +'" baseline="30000" dirty="0"/>';
+									strXml +='          	<a:t>'+ ' ' + encodeXmlEntities(obj.valueLabels[index]) +'</a:t>';
+									strXml +='        	</a:r>';
+								} else {
+									strXml +='        	<a:r>';
+									strXml +='        		<a:rPr lang="'+ (opts.lang || 'en-US') +'" dirty="0"/>';
+									strXml +='          	<a:t>'+ ' ' + encodeXmlEntities(obj.valueLabels[index]) +'</a:t>';
+									strXml +='        	</a:r>';
+								}
 								strXml +='        	<a:endParaRPr lang="'+ (opts.lang || 'en-US') +'" dirty="0"/>';
 								strXml +='      	</a:p>';
 								strXml +='      </c:rich>';

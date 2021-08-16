@@ -1,4 +1,4 @@
-/* PptxGenJS 3.7.1 @ 2021-08-03T10:02:20.581Z */
+/* PptxGenJS 3.7.1 @ 2021-08-13T12:43:38.410Z */
 'use strict';
 
 var JSZip = require('jszip');
@@ -5083,6 +5083,7 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                     if (obj.valueLabels && obj.valueLabels.length && opts.dataLabelFormatBar == 'custom') {
                         strXml += '<c:dLbls>';
                         obj.values.forEach(function (value, index) {
+                            var _a, _b;
                             if (opts.dataLabelFormatBar == 'custom') {
                                 strXml += '<c:dLbl>';
                                 strXml += " <c:numFmt formatCode=\"" + (opts.dataLabelFormatCode || 'General') + "\" sourceLinked=\"0\"/>";
@@ -5097,7 +5098,7 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                                 strXml += '      <a:pPr>';
                                 strXml +=
                                     '        <a:defRPr b="' + (opts.dataLabelFontBold ? 1 : 0) + '" i="0" strike="noStrike" sz="' + (opts.dataLabelFontSize || DEF_FONT_SIZE) + '00" u="none">';
-                                strXml += '          <a:solidFill>' + createColorElement(opts.dataLabelColor || DEF_FONT_COLOR) + '</a:solidFill>';
+                                strXml += '          <a:solidFill>' + createColorElement(((_a = obj.valueLabelsProp[index]) === null || _a === void 0 ? void 0 : _a.color) || opts.dataLabelColor || DEF_FONT_COLOR) + '</a:solidFill>';
                                 strXml += '          <a:latin typeface="' + (opts.dataLabelFontFace || 'Arial') + '"/>';
                                 strXml += '        </a:defRPr>';
                                 strXml += '      </a:pPr>';
@@ -5105,10 +5106,22 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                                 strXml += '      			<a:rPr lang="' + (opts.lang || 'en-US') + '" baseline="0"/>';
                                 strXml += '          	<a:t>[' + encodeXmlEntities(obj.name) + ']</a:t>';
                                 strXml += '        	</a:fld>';
-                                strXml += '        	<a:r>';
-                                strXml += '        		<a:rPr lang="' + (opts.lang || 'en-US') + '" dirty="0"/>';
-                                strXml += '          	<a:t>' + ' ' + encodeXmlEntities(obj.valueLabels[index]) + '</a:t>';
-                                strXml += '        	</a:r>';
+                                if ((_b = obj.valueLabelsProp[index]) === null || _b === void 0 ? void 0 : _b.superscript) {
+                                    strXml += '        	<a:r>';
+                                    strXml += '        		<a:rPr lang="' + (opts.lang || 'en-US') + '" dirty="0"/>';
+                                    strXml += '          	<a:t></a:t>';
+                                    strXml += '        	</a:r>';
+                                    strXml += '        	<a:r>';
+                                    strXml += '        		<a:rPr lang="' + (opts.lang || 'en-US') + '" baseline="30000" dirty="0"/>';
+                                    strXml += '          	<a:t>' + ' ' + encodeXmlEntities(obj.valueLabels[index]) + '</a:t>';
+                                    strXml += '        	</a:r>';
+                                }
+                                else {
+                                    strXml += '        	<a:r>';
+                                    strXml += '        		<a:rPr lang="' + (opts.lang || 'en-US') + '" dirty="0"/>';
+                                    strXml += '          	<a:t>' + ' ' + encodeXmlEntities(obj.valueLabels[index]) + '</a:t>';
+                                    strXml += '        	</a:r>';
+                                }
                                 strXml += '        	<a:endParaRPr lang="' + (opts.lang || 'en-US') + '" dirty="0"/>';
                                 strXml += '      	</a:p>';
                                 strXml += '      </c:rich>';
