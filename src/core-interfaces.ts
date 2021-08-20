@@ -1093,6 +1093,7 @@ export interface IChartPropsBase {
 	showPercent?: boolean
 	showTitle?: boolean
 	showValue?: boolean
+	subTitles?: IChartPropsTitle[],
 	/**
 	 * 3D perspecitve
 	 * - range: 0-100

@@ -1,4 +1,4 @@
-/* PptxGenJS 3.7.1 @ 2021-08-13T12:43:38.420Z */
+/* PptxGenJS 3.7.1 @ 2021-08-20T15:01:18.516Z */
 import JSZip from 'jszip';
 
 /*! *****************************************************************************
@@ -4658,18 +4658,20 @@ function makeXmlCharts(rel) {
             '<c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">';
         strXml += '<c:date1904 val="0"/>'; // ppt defaults to 1904 dates, excel to 1900
         strXml += '<c:chart>';
+        var getFormattedDataTitle_1 = function (item) { return ({
+            title: item.title || 'Chart Title',
+            color: item.titleColor,
+            fontFace: item.titleFontFace,
+            fontSize: item.titleFontSize || DEF_FONT_TITLE_SIZE,
+            titleAlign: item.titleAlign,
+            titleBold: item.titleBold,
+            titlePos: item.titlePos,
+            titleRotate: item.titleRotate,
+        }); };
+        var subTitles = rel.opts.subTitles || [];
         // OPTION: Title
         if (rel.opts.showTitle) {
-            strXml += genXmlTitle({
-                title: rel.opts.title || 'Chart Title',
-                color: rel.opts.titleColor,
-                fontFace: rel.opts.titleFontFace,
-                fontSize: rel.opts.titleFontSize || DEF_FONT_TITLE_SIZE,
-                titleAlign: rel.opts.titleAlign,
-                titleBold: rel.opts.titleBold,
-                titlePos: rel.opts.titlePos,
-                titleRotate: rel.opts.titleRotate,
-            });
+            strXml += genXmlTitle(getFormattedDataTitle_1(rel.opts), subTitles.map(function (i) { return getFormattedDataTitle_1(i); }));
             strXml += '<c:autoTitleDeleted val="0"/>';
         }
         else {
@@ -6035,15 +6037,20 @@ function makeSerAxis(opts, axisId, valAxisId) {
  * @param {IChartPropsTitle} opts - options
  * @return {string} XML `<c:title>`
  */
-function genXmlTitle(opts) {
+function getTextMarkup(opts) {
     var align = opts.titleAlign === 'left' || opts.titleAlign === 'right' ? "<a:pPr algn=\"" + opts.titleAlign.substring(0, 1) + "\">" : "<a:pPr>";
     var rotate = opts.titleRotate ? "<a:bodyPr rot=\"" + convertRotationDegrees(opts.titleRotate) + "\"/>" : "<a:bodyPr/>"; // don't specify rotation to get default (ex. vertical for cat axis)
     var sizeAttr = opts.fontSize ? 'sz="' + Math.round(opts.fontSize * 100) + '"' : ''; // only set the font size if specified.  Powerpoint will handle the default size
     var titleBold = opts.titleBold === true ? 1 : 0;
+    return "\n\t\t      " + rotate + "\n\t      <a:lstStyle/>\n\t      <a:p>\n\t        " + align + "\n\t        <a:defRPr " + sizeAttr + " b=\"" + titleBold + "\" i=\"0\" u=\"none\" strike=\"noStrike\">\n\t          <a:solidFill>" + createColorElement(opts.color || DEF_FONT_COLOR) + "</a:solidFill>\n\t          <a:latin typeface=\"" + (opts.fontFace || 'Arial') + "\"/>\n\t        </a:defRPr>\n\t      </a:pPr>\n\t      <a:r>\n\t        <a:rPr " + sizeAttr + " b=\"" + titleBold + "\" i=\"0\" u=\"none\" strike=\"noStrike\">\n\t          <a:solidFill>" + createColorElement(opts.color || DEF_FONT_COLOR) + "</a:solidFill>\n\t          <a:latin typeface=\"" + (opts.fontFace || 'Arial') + "\"/>\n\t        </a:rPr>\n\t        <a:t>" + (encodeXmlEntities(opts.title) || '') + "</a:t>\n\t      </a:r>\n\t    </a:p>";
+}
+function genXmlTitle(opts, subTitles) {
+    if (subTitles === void 0) { subTitles = []; }
     var layout = opts.titlePos && opts.titlePos.x && opts.titlePos.y
         ? "<c:layout><c:manualLayout><c:xMode val=\"edge\"/><c:yMode val=\"edge\"/><c:x val=\"" + opts.titlePos.x + "\"/><c:y val=\"" + opts.titlePos.y + "\"/></c:manualLayout></c:layout>"
         : "<c:layout/>";
-    return "<c:title>\n\t  <c:tx>\n\t    <c:rich>\n\t      " + rotate + "\n\t      <a:lstStyle/>\n\t      <a:p>\n\t        " + align + "\n\t        <a:defRPr " + sizeAttr + " b=\"" + titleBold + "\" i=\"0\" u=\"none\" strike=\"noStrike\">\n\t          <a:solidFill>" + createColorElement(opts.color || DEF_FONT_COLOR) + "</a:solidFill>\n\t          <a:latin typeface=\"" + (opts.fontFace || 'Arial') + "\"/>\n\t        </a:defRPr>\n\t      </a:pPr>\n\t      <a:r>\n\t        <a:rPr " + sizeAttr + " b=\"" + titleBold + "\" i=\"0\" u=\"none\" strike=\"noStrike\">\n\t          <a:solidFill>" + createColorElement(opts.color || DEF_FONT_COLOR) + "</a:solidFill>\n\t          <a:latin typeface=\"" + (opts.fontFace || 'Arial') + "\"/>\n\t        </a:rPr>\n\t        <a:t>" + (encodeXmlEntities(opts.title) || '') + "</a:t>\n\t      </a:r>\n\t    </a:p>\n\t    </c:rich>\n\t  </c:tx>\n\t  " + layout + "\n\t  <c:overlay val=\"0\"/>\n\t</c:title>";
+    var titlesMarkup = __spreadArray([__assign({}, opts)], subTitles).reduce(function (acc, item) { return acc += getTextMarkup(item); }, "");
+    return "<c:title>\n\t  <c:tx>\n\t    <c:rich>\n\t      " + titlesMarkup + "\n\t    </c:rich>\n\t  </c:tx>\n\t  " + layout + "\n\t  <c:overlay val=\"0\"/>\n\t</c:title>";
 }
 /**
  * Calc and return excel column name for a given column length

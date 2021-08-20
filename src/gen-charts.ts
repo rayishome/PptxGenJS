@@ -443,18 +443,22 @@ export function makeXmlCharts(rel: ISlideRelChart): string {
 		strXml += '<c:date1904 val="0"/>' // ppt defaults to 1904 dates, excel to 1900
 		strXml += '<c:chart>'
 
+		const getFormattedDataTitle = (item): IChartPropsTitle => ({
+			title: item.title || 'Chart Title',
+			color: item.titleColor,
+			fontFace: item.titleFontFace,
+			fontSize: item.titleFontSize || DEF_FONT_TITLE_SIZE,
+			titleAlign: item.titleAlign,
+			titleBold: item.titleBold,
+			titlePos: item.titlePos,
+			titleRotate: item.titleRotate,
+		});
+
+		const subTitles = rel.opts.subTitles || [];
+
 		// OPTION: Title
 		if (rel.opts.showTitle) {
-			strXml += genXmlTitle({
-				title: rel.opts.title || 'Chart Title',
-				color: rel.opts.titleColor,
-				fontFace: rel.opts.titleFontFace,
-				fontSize: rel.opts.titleFontSize || DEF_FONT_TITLE_SIZE,
-				titleAlign: rel.opts.titleAlign,
-				titleBold: rel.opts.titleBold,
-				titlePos: rel.opts.titlePos,
-				titleRotate: rel.opts.titleRotate,
-			})
+			strXml += genXmlTitle(getFormattedDataTitle(rel.opts), subTitles.map(i => getFormattedDataTitle(i)))
 			strXml += '<c:autoTitleDeleted val="0"/>'
 		} else {
 			// NOTE: Add autoTitleDeleted tag in else to prevent default creation of chart title even when showTitle is set to false
@@ -1875,20 +1879,13 @@ function makeSerAxis(opts: IChartOptsLib, axisId: string, valAxisId: string): st
  * @param {IChartPropsTitle} opts - options
  * @return {string} XML `<c:title>`
  */
-function genXmlTitle(opts: IChartPropsTitle): string {
+function getTextMarkup(opts: IChartPropsTitle): string {
 	let align = opts.titleAlign === 'left' || opts.titleAlign === 'right' ? `<a:pPr algn="${opts.titleAlign.substring(0, 1)}">` : `<a:pPr>`
 	let rotate = opts.titleRotate ? `<a:bodyPr rot="${convertRotationDegrees(opts.titleRotate)}"/>` : `<a:bodyPr/>` // don't specify rotation to get default (ex. vertical for cat axis)
 	let sizeAttr = opts.fontSize ? 'sz="' + Math.round(opts.fontSize * 100) + '"' : '' // only set the font size if specified.  Powerpoint will handle the default size
 	let titleBold = opts.titleBold === true ? 1 : 0
-	let layout =
-		opts.titlePos && opts.titlePos.x && opts.titlePos.y
-			? `<c:layout><c:manualLayout><c:xMode val="edge"/><c:yMode val="edge"/><c:x val="${opts.titlePos.x}"/><c:y val="${opts.titlePos.y}"/></c:manualLayout></c:layout>`
-			: `<c:layout/>`
-
-	return `<c:title>
-	  <c:tx>
-	    <c:rich>
-	      ${rotate}
+	return `
+		      ${rotate}
 	      <a:lstStyle/>
 	      <a:p>
 	        ${align}
@@ -1904,7 +1901,21 @@ function genXmlTitle(opts: IChartPropsTitle): string {
 	        </a:rPr>
 	        <a:t>${encodeXmlEntities(opts.title) || ''}</a:t>
 	      </a:r>
-	    </a:p>
+	    </a:p>`
+}
+
+function genXmlTitle(opts: IChartPropsTitle, subTitles: IChartPropsTitle[] = []): string {
+	let layout =
+		opts.titlePos && opts.titlePos.x && opts.titlePos.y
+			? `<c:layout><c:manualLayout><c:xMode val="edge"/><c:yMode val="edge"/><c:x val="${opts.titlePos.x}"/><c:y val="${opts.titlePos.y}"/></c:manualLayout></c:layout>`
+			: `<c:layout/>`;
+
+	const titlesMarkup = [{...opts}, ...subTitles].reduce((acc, item) => acc += getTextMarkup(item), ``);
+
+	return `<c:title>
+	  <c:tx>
+	    <c:rich>
+	      ${titlesMarkup}
 	    </c:rich>
 	  </c:tx>
 	  ${layout}
