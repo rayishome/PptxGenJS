@@ -717,6 +717,10 @@ function makeChartType(chartType: CHART_NAME, data: OptsChartData[], opts: IChar
 				let seriesColor = opts.chartColors ? opts.chartColors[colorIndex % opts.chartColors.length] : null
 
 				strXml += '  <c:spPr>'
+				if(chartType === CHART_TYPE.BAR && opts?.dataPointBorder?.isEnabled && data.length > 1 ) {
+					const color = opts?.dataPointBorder?.BorderColor.replace('#','') || '000000';
+					strXml += `<a:ln w="${valToPts(opts.dataPointBorder.BorderWidth)}"><a:solidFill><a:srgbClr val="${color}"/></a:solidFill></a:ln>`
+				}
 				if (seriesColor === 'transparent') {
 					strXml += '<a:noFill/>'
 				} else if (opts.chartColorsOpacity) {
@@ -819,6 +823,10 @@ function makeChartType(chartType: CHART_NAME, data: OptsChartData[], opts: IChar
 						strXml += '      <c:invertIfNegative val="0"/>'
 						strXml += '    <c:bubble3D val="0"/>'
 						strXml += '    <c:spPr>'
+						if(chartType === CHART_TYPE.BAR && opts.barGrouping === 'clustered' && opts?.dataPointBorder?.isEnabled) {
+							const color = opts?.dataPointBorder?.BorderColor.replace('#','') || '000000';
+							strXml += `<a:ln w="${valToPts(opts.dataPointBorder.BorderWidth)}"><a:solidFill><a:srgbClr val="${color}"/></a:solidFill></a:ln>`
+						}
 						if (opts.lineSize === 0) {
 							strXml += '<a:ln><a:noFill/></a:ln>'
 						} else if (chartType === CHART_TYPE.BAR) {

@@ -1047,6 +1047,15 @@ export interface OptsValueLabel {
 	color?: HexColor
 }
 
+export interface OptsDataPointBorder {
+	dataPointBorder?: {
+		isEnabled?: boolean,
+		BorderColor?: string,
+		BorderLineType?: string,
+		BorderWidth?: number,
+	}
+}
+
 export interface OptsChartGridLine {
 	/**
 	 * Gridline color (hex)
@@ -1326,6 +1335,7 @@ export interface IChartOpts
 		IChartPropsLegend,
 		IChartPropsTitle,
 		OptsChartGridLine,
+		OptsDataPointBorder,
 		PositionProps {
 	/**
 	 * Alt Text value ("How would you describe this object and its contents to someone who is blind?")
@@ -1334,7 +1344,7 @@ export interface IChartOpts
 	altText?: string
 }
 export interface IChartOptsLib extends IChartOpts {
-	_type?: CHART_NAME | IChartMulti[] // TODO: v3.4.0 - move to `IChartOpts`, remove `IChartOptsLib`
+	_type?: CHART_NAME | IChartMulti[] // TODO: v3.4.0 - move to `IChartOpts`, remove `IChartOptsLib`,
 }
 export interface ISlideRelChart extends OptsChartData {
 	type: CHART_NAME | IChartMulti[]

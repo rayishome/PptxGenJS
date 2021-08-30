@@ -1,4 +1,4 @@
-/* PptxGenJS 3.7.1 @ 2021-08-20T15:01:18.516Z */
+/* PptxGenJS 3.7.1 @ 2021-08-30T14:36:29.921Z */
 import JSZip from 'jszip';
 
 /*! *****************************************************************************
@@ -4894,6 +4894,7 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
             */
             var colorIndex_1 = -1; // Maintain the color index by region
             data.forEach(function (obj) {
+                var _a, _b;
                 colorIndex_1++;
                 var idx = obj.index;
                 strXml += '<c:ser>';
@@ -4911,6 +4912,10 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                 // WIP: let seriesColor = obj.color ? obj.color : opts.chartColors ? opts.chartColors[colorIndex % opts.chartColors.length] : null
                 var seriesColor = opts.chartColors ? opts.chartColors[colorIndex_1 % opts.chartColors.length] : null;
                 strXml += '  <c:spPr>';
+                if (chartType === CHART_TYPE.BAR && ((_a = opts === null || opts === void 0 ? void 0 : opts.dataPointBorder) === null || _a === void 0 ? void 0 : _a.isEnabled) && data.length > 1) {
+                    var color = ((_b = opts === null || opts === void 0 ? void 0 : opts.dataPointBorder) === null || _b === void 0 ? void 0 : _b.BorderColor.replace('#', '')) || '000000';
+                    strXml += "<a:ln w=\"" + valToPts(opts.dataPointBorder.BorderWidth) + "\"><a:solidFill><a:srgbClr val=\"" + color + "\"/></a:solidFill></a:ln>";
+                }
                 if (seriesColor === 'transparent') {
                     strXml += '<a:noFill/>';
                 }
@@ -5002,12 +5007,17 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                     opts.chartColors.length > 1) {
                     // Series Data Point colors
                     obj.values.forEach(function (value, index) {
+                        var _a, _b;
                         var arrColors = value < 0 ? opts.invertedColors || opts.chartColors || BARCHART_COLORS : opts.chartColors || [];
                         strXml += '  <c:dPt>';
                         strXml += '    <c:idx val="' + index + '"/>';
                         strXml += '      <c:invertIfNegative val="0"/>';
                         strXml += '    <c:bubble3D val="0"/>';
                         strXml += '    <c:spPr>';
+                        if (chartType === CHART_TYPE.BAR && opts.barGrouping === 'clustered' && ((_a = opts === null || opts === void 0 ? void 0 : opts.dataPointBorder) === null || _a === void 0 ? void 0 : _a.isEnabled)) {
+                            var color = ((_b = opts === null || opts === void 0 ? void 0 : opts.dataPointBorder) === null || _b === void 0 ? void 0 : _b.BorderColor.replace('#', '')) || '000000';
+                            strXml += "<a:ln w=\"" + valToPts(opts.dataPointBorder.BorderWidth) + "\"><a:solidFill><a:srgbClr val=\"" + color + "\"/></a:solidFill></a:ln>";
+                        }
                         if (opts.lineSize === 0) {
                             strXml += '<a:ln><a:noFill/></a:ln>';
                         }
