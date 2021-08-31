@@ -1519,6 +1519,12 @@ function makeChartType(chartType: CHART_NAME, data: OptsChartData[], opts: IChar
 						opts.dataBorder.color
 					)}</a:solidFill><a:prstDash val="solid"/><a:round/></a:ln>`
 				}
+				if (opts?.dataPointBorder?.isEnabled) {
+					const color = opts?.dataPointBorder?.BorderColor.replace('#','') || '000000';
+					strXml += `<a:ln w="${valToPts(opts.dataPointBorder.BorderWidth)}" cap="flat"><a:solidFill>${createColorElement(
+						color
+					)}</a:solidFill><a:prstDash val="solid"/><a:round/></a:ln>`
+				}
 				strXml += createShadowElement(opts.shadow, DEF_SHAPE_SHADOW)
 				strXml += '  </c:spPr>'
 				strXml += '</c:dPt>'
@@ -1534,7 +1540,7 @@ function makeChartType(chartType: CHART_NAME, data: OptsChartData[], opts: IChar
 				strXml += '   <a:bodyPr/><a:lstStyle/>'
 				strXml += '   <a:p><a:pPr>'
 				strXml += `   <a:defRPr sz="${Math.round((opts.dataLabelFontSize || DEF_FONT_SIZE) * 100)}" b="${opts.dataLabelFontBold ? 1 : 0}" i="${opts.dataLabelFontItalic ? 1 : 0}" u="none" strike="noStrike">`
-				strXml += '    <a:solidFill>' + createColorElement(opts.dataLabelColor || DEF_FONT_COLOR) + '</a:solidFill>'
+				strXml += '    <a:solidFill>' + createColorElement(obj.valueLabelsProp[idx]?.color || opts.dataLabelColor || DEF_FONT_COLOR) + '</a:solidFill>'
 				strXml += `    <a:latin typeface="${opts.dataLabelFontFace || 'Arial'}"/>`
 				strXml += '   </a:defRPr>'
 				strXml += '      </a:pPr></a:p>'

@@ -1,4 +1,4 @@
-/* PptxGenJS 3.7.1 @ 2021-08-30T14:36:29.903Z */
+/* PptxGenJS 3.7.1 @ 2021-08-31T10:06:48.384Z */
 'use strict';
 
 var JSZip = require('jszip');
@@ -5634,7 +5634,7 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
         case CHART_TYPE.DOUGHNUT:
         case CHART_TYPE.PIE:
             // Use the same let name so code blocks from barChart are interchangeable
-            var obj = data[0];
+            var obj_1 = data[0];
             /* EX:
                 data: [
                  {
@@ -5655,7 +5655,7 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
             strXml += '      <c:f>Sheet1!$B$1</c:f>';
             strXml += '      <c:strCache>';
             strXml += '        <c:ptCount val="1"/>';
-            strXml += '        <c:pt idx="0"><c:v>' + encodeXmlEntities(obj.name) + '</c:v></c:pt>';
+            strXml += '        <c:pt idx="0"><c:v>' + encodeXmlEntities(obj_1.name) + '</c:v></c:pt>';
             strXml += '      </c:strCache>';
             strXml += '    </c:strRef>';
             strXml += '  </c:tx>';
@@ -5671,7 +5671,8 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
             strXml += '  </c:spPr>';
             //strXml += '<c:explosion val="0"/>'
             // 2: "Data Point" block for every data row
-            obj.labels.forEach(function (_label, idx) {
+            obj_1.labels.forEach(function (_label, idx) {
+                var _a, _b;
                 strXml += '<c:dPt>';
                 strXml += " <c:idx val=\"" + idx + "\"/>";
                 strXml += ' <c:bubble3D val="0"/>';
@@ -5680,13 +5681,18 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                 if (opts.dataBorder) {
                     strXml += "<a:ln w=\"" + valToPts(opts.dataBorder.pt) + "\" cap=\"flat\"><a:solidFill>" + createColorElement(opts.dataBorder.color) + "</a:solidFill><a:prstDash val=\"solid\"/><a:round/></a:ln>";
                 }
+                if ((_a = opts === null || opts === void 0 ? void 0 : opts.dataPointBorder) === null || _a === void 0 ? void 0 : _a.isEnabled) {
+                    var color = ((_b = opts === null || opts === void 0 ? void 0 : opts.dataPointBorder) === null || _b === void 0 ? void 0 : _b.BorderColor.replace('#', '')) || '000000';
+                    strXml += "<a:ln w=\"" + valToPts(opts.dataPointBorder.BorderWidth) + "\" cap=\"flat\"><a:solidFill>" + createColorElement(color) + "</a:solidFill><a:prstDash val=\"solid\"/><a:round/></a:ln>";
+                }
                 strXml += createShadowElement(opts.shadow, DEF_SHAPE_SHADOW);
                 strXml += '  </c:spPr>';
                 strXml += '</c:dPt>';
             });
             // 3: "Data Label" block for every data Label
             strXml += '<c:dLbls>';
-            obj.labels.forEach(function (_label, idx) {
+            obj_1.labels.forEach(function (_label, idx) {
+                var _a;
                 strXml += '<c:dLbl>';
                 strXml += " <c:idx val=\"" + idx + "\"/>";
                 strXml += "  <c:numFmt formatCode=\"" + (opts.dataLabelFormatCode || 'General') + "\" sourceLinked=\"0\"/>";
@@ -5694,7 +5700,7 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                 strXml += '   <a:bodyPr/><a:lstStyle/>';
                 strXml += '   <a:p><a:pPr>';
                 strXml += "   <a:defRPr sz=\"" + Math.round((opts.dataLabelFontSize || DEF_FONT_SIZE) * 100) + "\" b=\"" + (opts.dataLabelFontBold ? 1 : 0) + "\" i=\"" + (opts.dataLabelFontItalic ? 1 : 0) + "\" u=\"none\" strike=\"noStrike\">";
-                strXml += '    <a:solidFill>' + createColorElement(opts.dataLabelColor || DEF_FONT_COLOR) + '</a:solidFill>';
+                strXml += '    <a:solidFill>' + createColorElement(((_a = obj_1.valueLabelsProp[idx]) === null || _a === void 0 ? void 0 : _a.color) || opts.dataLabelColor || DEF_FONT_COLOR) + '</a:solidFill>';
                 strXml += "    <a:latin typeface=\"" + (opts.dataLabelFontFace || 'Arial') + "\"/>";
                 strXml += '   </a:defRPr>';
                 strXml += '      </a:pPr></a:p>';
@@ -5733,10 +5739,10 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
             // 2: "Categories"
             strXml += '<c:cat>';
             strXml += '  <c:strRef>';
-            strXml += '    <c:f>Sheet1!$A$2:$A$' + (obj.labels.length + 1) + '</c:f>';
+            strXml += '    <c:f>Sheet1!$A$2:$A$' + (obj_1.labels.length + 1) + '</c:f>';
             strXml += '    <c:strCache>';
-            strXml += '	     <c:ptCount val="' + obj.labels.length + '"/>';
-            obj.labels.forEach(function (label, idx) {
+            strXml += '	     <c:ptCount val="' + obj_1.labels.length + '"/>';
+            obj_1.labels.forEach(function (label, idx) {
                 strXml += '<c:pt idx="' + idx + '"><c:v>' + encodeXmlEntities(label) + '</c:v></c:pt>';
             });
             strXml += '    </c:strCache>';
@@ -5745,10 +5751,10 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
             // 3: Create vals
             strXml += '  <c:val>';
             strXml += '    <c:numRef>';
-            strXml += '      <c:f>Sheet1!$B$2:$B$' + (obj.labels.length + 1) + '</c:f>';
+            strXml += '      <c:f>Sheet1!$B$2:$B$' + (obj_1.labels.length + 1) + '</c:f>';
             strXml += '      <c:numCache>';
-            strXml += '	       <c:ptCount val="' + obj.labels.length + '"/>';
-            obj.values.forEach(function (value, idx) {
+            strXml += '	       <c:ptCount val="' + obj_1.labels.length + '"/>';
+            obj_1.values.forEach(function (value, idx) {
                 strXml += '<c:pt idx="' + idx + '"><c:v>' + (value || value === 0 ? value : '') + '</c:v></c:pt>';
             });
             strXml += '      </c:numCache>';
