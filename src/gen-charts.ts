@@ -717,16 +717,17 @@ function makeChartType(chartType: CHART_NAME, data: OptsChartData[], opts: IChar
 				let seriesColor = opts.chartColors ? opts.chartColors[colorIndex % opts.chartColors.length] : null
 
 				strXml += '  <c:spPr>'
-				if(chartType === CHART_TYPE.BAR && opts?.dataPointBorder?.isEnabled && data.length > 1 ) {
-					const color = opts?.dataPointBorder?.BorderColor.replace('#','') || '000000';
-					strXml += `<a:ln w="${valToPts(opts.dataPointBorder.BorderWidth)}"><a:solidFill><a:srgbClr val="${color}"/></a:solidFill></a:ln>`
-				}
 				if (seriesColor === 'transparent') {
 					strXml += '<a:noFill/>'
 				} else if (opts.chartColorsOpacity) {
 					strXml += '<a:solidFill>' + createColorElement(seriesColor, `<a:alpha val="${Math.round(opts.chartColorsOpacity * 1000)}"/>`) + '</a:solidFill>'
 				} else {
 					strXml += '<a:solidFill>' + createColorElement(seriesColor) + '</a:solidFill>'
+				}
+
+				if(chartType === CHART_TYPE.BAR && opts?.dataPointBorder?.isEnabled && data.length > 1 ) {
+					const color = opts?.dataPointBorder?.BorderColor.replace('#','') || '000000';
+					strXml += `<a:ln w="${valToPts(opts.dataPointBorder.BorderWidth)}"><a:solidFill><a:srgbClr val="${color}"/></a:solidFill></a:ln>`
 				}
 
 				if (chartType === CHART_TYPE.LINE) {
@@ -823,10 +824,6 @@ function makeChartType(chartType: CHART_NAME, data: OptsChartData[], opts: IChar
 						strXml += '      <c:invertIfNegative val="0"/>'
 						strXml += '    <c:bubble3D val="0"/>'
 						strXml += '    <c:spPr>'
-						if(chartType === CHART_TYPE.BAR && opts.barGrouping === 'clustered' && opts?.dataPointBorder?.isEnabled) {
-							const color = opts?.dataPointBorder?.BorderColor.replace('#','') || '000000';
-							strXml += `<a:ln w="${valToPts(opts.dataPointBorder.BorderWidth)}"><a:solidFill><a:srgbClr val="${color}"/></a:solidFill></a:ln>`
-						}
 						if (opts.lineSize === 0) {
 							strXml += '<a:ln><a:noFill/></a:ln>'
 						} else if (chartType === CHART_TYPE.BAR) {
@@ -839,6 +836,10 @@ function makeChartType(chartType: CHART_NAME, data: OptsChartData[], opts: IChar
 							strXml += '   <a:srgbClr val="' + arrColors[index % arrColors.length] + '"/>'
 							strXml += '  </a:solidFill>'
 							strXml += '</a:ln>'
+						}
+						if(chartType === CHART_TYPE.BAR && opts.barGrouping === 'clustered' && opts?.dataPointBorder?.isEnabled) {
+							const color = opts?.dataPointBorder?.BorderColor.replace('#','') || '000000';
+							strXml += `<a:ln w="${valToPts(opts.dataPointBorder.BorderWidth)}"><a:solidFill><a:srgbClr val="${color}"/></a:solidFill></a:ln>`
 						}
 						strXml += createShadowElement(opts.shadow, DEF_SHAPE_SHADOW)
 						strXml += '    </c:spPr>'

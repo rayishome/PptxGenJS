@@ -1,4 +1,4 @@
-/* PptxGenJS 3.7.1 @ 2021-08-31T10:06:48.394Z */
+/* PptxGenJS 3.7.1 @ 2021-09-01T11:45:11.323Z */
 import JSZip from 'jszip';
 
 /*! *****************************************************************************
@@ -4912,10 +4912,6 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                 // WIP: let seriesColor = obj.color ? obj.color : opts.chartColors ? opts.chartColors[colorIndex % opts.chartColors.length] : null
                 var seriesColor = opts.chartColors ? opts.chartColors[colorIndex_1 % opts.chartColors.length] : null;
                 strXml += '  <c:spPr>';
-                if (chartType === CHART_TYPE.BAR && ((_a = opts === null || opts === void 0 ? void 0 : opts.dataPointBorder) === null || _a === void 0 ? void 0 : _a.isEnabled) && data.length > 1) {
-                    var color = ((_b = opts === null || opts === void 0 ? void 0 : opts.dataPointBorder) === null || _b === void 0 ? void 0 : _b.BorderColor.replace('#', '')) || '000000';
-                    strXml += "<a:ln w=\"" + valToPts(opts.dataPointBorder.BorderWidth) + "\"><a:solidFill><a:srgbClr val=\"" + color + "\"/></a:solidFill></a:ln>";
-                }
                 if (seriesColor === 'transparent') {
                     strXml += '<a:noFill/>';
                 }
@@ -4924,6 +4920,10 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                 }
                 else {
                     strXml += '<a:solidFill>' + createColorElement(seriesColor) + '</a:solidFill>';
+                }
+                if (chartType === CHART_TYPE.BAR && ((_a = opts === null || opts === void 0 ? void 0 : opts.dataPointBorder) === null || _a === void 0 ? void 0 : _a.isEnabled) && data.length > 1) {
+                    var color = ((_b = opts === null || opts === void 0 ? void 0 : opts.dataPointBorder) === null || _b === void 0 ? void 0 : _b.BorderColor.replace('#', '')) || '000000';
+                    strXml += "<a:ln w=\"" + valToPts(opts.dataPointBorder.BorderWidth) + "\"><a:solidFill><a:srgbClr val=\"" + color + "\"/></a:solidFill></a:ln>";
                 }
                 if (chartType === CHART_TYPE.LINE) {
                     if (opts.lineSize === 0) {
@@ -5014,10 +5014,6 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                         strXml += '      <c:invertIfNegative val="0"/>';
                         strXml += '    <c:bubble3D val="0"/>';
                         strXml += '    <c:spPr>';
-                        if (chartType === CHART_TYPE.BAR && opts.barGrouping === 'clustered' && ((_a = opts === null || opts === void 0 ? void 0 : opts.dataPointBorder) === null || _a === void 0 ? void 0 : _a.isEnabled)) {
-                            var color = ((_b = opts === null || opts === void 0 ? void 0 : opts.dataPointBorder) === null || _b === void 0 ? void 0 : _b.BorderColor.replace('#', '')) || '000000';
-                            strXml += "<a:ln w=\"" + valToPts(opts.dataPointBorder.BorderWidth) + "\"><a:solidFill><a:srgbClr val=\"" + color + "\"/></a:solidFill></a:ln>";
-                        }
                         if (opts.lineSize === 0) {
                             strXml += '<a:ln><a:noFill/></a:ln>';
                         }
@@ -5032,6 +5028,10 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                             strXml += '   <a:srgbClr val="' + arrColors[index % arrColors.length] + '"/>';
                             strXml += '  </a:solidFill>';
                             strXml += '</a:ln>';
+                        }
+                        if (chartType === CHART_TYPE.BAR && opts.barGrouping === 'clustered' && ((_a = opts === null || opts === void 0 ? void 0 : opts.dataPointBorder) === null || _a === void 0 ? void 0 : _a.isEnabled)) {
+                            var color = ((_b = opts === null || opts === void 0 ? void 0 : opts.dataPointBorder) === null || _b === void 0 ? void 0 : _b.BorderColor.replace('#', '')) || '000000';
+                            strXml += "<a:ln w=\"" + valToPts(opts.dataPointBorder.BorderWidth) + "\"><a:solidFill><a:srgbClr val=\"" + color + "\"/></a:solidFill></a:ln>";
                         }
                         strXml += createShadowElement(opts.shadow, DEF_SHAPE_SHADOW);
                         strXml += '    </c:spPr>';
