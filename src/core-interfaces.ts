@@ -1106,11 +1106,27 @@ export interface OptsChartData {
 	name?: string
 	sizes?: number[]
 	values?: number[]
+	valueLabels?: string[]
+	valueLabelsProp?: OptsValueLabel[]
 	/**
 	 * Override `chartColors`
 	 */
 	//color?: string // TODO: WIP: (Pull #727)
 }
+export interface OptsValueLabel {
+	superscript?: boolean
+	color?: HexColor
+}
+
+export interface OptsDataPointBorder {
+	dataPointBorder?: {
+		isEnabled?: boolean,
+		BorderColor?: string,
+		BorderLineType?: string,
+		BorderWidth?: number,
+	}
+}
+
 export interface OptsChartGridLine {
 	/**
 	 * Gridline color (hex)
@@ -1157,6 +1173,7 @@ export interface IChartPropsBase {
 	showPercent?: boolean
 	showTitle?: boolean
 	showValue?: boolean
+	subTitles?: IChartPropsTitle[],
 	/**
 	 * 3D perspecitve
 	 * - range: 0-100
@@ -1391,6 +1408,7 @@ export interface IChartPropsDataLabel {
 	dataLabelFormatCode?: string
 	dataLabelFormatScatter?: 'custom' | 'customXY' | 'XY'
 	dataLabelPosition?: 'b' | 'bestFit' | 'ctr' | 'l' | 'r' | 't' | 'inEnd' | 'outEnd'
+	dataLabelFormatBar?: 'custom'
 }
 export interface IChartPropsDataTable {
 	dataTableFontSize?: number
@@ -1445,10 +1463,20 @@ export interface IChartOpts
 	 * Alt Text value ("How would you describe this object and its contents to someone who is blind?")
 	 * - PowerPoint: [right-click on a chart] > "Edit Alt Text..."
 	 */
-	altText?: string
+	altText?: string,
+	dataPointBorder: {
+		isEnabled: boolean,
+		BorderColor: string,
+		BorderWidth: number
+	};
 }
 export interface IChartOptsLib extends IChartOpts {
-	_type?: CHART_NAME | IChartMulti[] // TODO: v3.4.0 - move to `IChartOpts`, remove `IChartOptsLib`
+	dataPointBorder: {
+		isEnabled: boolean,
+		BorderColor: string,
+		BorderWidth: number
+	};
+	_type?: CHART_NAME | IChartMulti[] // TODO: v3.4.0 - move to `IChartOpts`, remove `IChartOptsLib`,
 }
 export interface ISlideRelChart extends OptsChartData {
 	type: CHART_NAME | IChartMulti[]

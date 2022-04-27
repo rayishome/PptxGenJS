@@ -19,7 +19,15 @@ import {
 	LETTERS,
 	ONEPT,
 } from './core-enums'
-import { IChartOptsLib, ISlideRelChart, ShadowProps, OptsChartData, IChartPropsTitle, OptsChartGridLine } from './core-interfaces'
+import {
+	IChartOptsLib,
+	ISlideRelChart,
+	ShadowProps,
+	OptsChartData,
+	IChartPropsTitle,
+	OptsChartGridLine,
+	HexColor
+} from "./core-interfaces";
 import { createColorElement, genXmlColorSelection, convertRotationDegrees, encodeXmlEntities, getMix, getUuid, valToPts } from './gen-utils'
 import JSZip from 'jszip'
 
@@ -435,18 +443,22 @@ export function makeXmlCharts(rel: ISlideRelChart): string {
 		strXml += '<c:date1904 val="0"/>' // ppt defaults to 1904 dates, excel to 1900
 		strXml += '<c:chart>'
 
+		const getFormattedDataTitle = (item): IChartPropsTitle => ({
+			title: item.title || 'Chart Title',
+			color: item.titleColor,
+			fontFace: item.titleFontFace,
+			fontSize: item.titleFontSize || DEF_FONT_TITLE_SIZE,
+			titleAlign: item.titleAlign,
+			titleBold: item.titleBold,
+			titlePos: item.titlePos,
+			titleRotate: item.titleRotate,
+		});
+
+		const subTitles = rel.opts.subTitles || [];
+
 		// OPTION: Title
 		if (rel.opts.showTitle) {
-			strXml += genXmlTitle({
-				title: rel.opts.title || 'Chart Title',
-				color: rel.opts.titleColor,
-				fontFace: rel.opts.titleFontFace,
-				fontSize: rel.opts.titleFontSize || DEF_FONT_TITLE_SIZE,
-				titleAlign: rel.opts.titleAlign,
-				titleBold: rel.opts.titleBold,
-				titlePos: rel.opts.titlePos,
-				titleRotate: rel.opts.titleRotate,
-			})
+			strXml += genXmlTitle(getFormattedDataTitle(rel.opts), subTitles.map(i => getFormattedDataTitle(i)))
 			strXml += '<c:autoTitleDeleted val="0"/>'
 		} else {
 			// NOTE: Add autoTitleDeleted tag in else to prevent default creation of chart title even when showTitle is set to false
@@ -713,6 +725,11 @@ function makeChartType(chartType: CHART_NAME, data: OptsChartData[], opts: IChar
 					strXml += '<a:solidFill>' + createColorElement(seriesColor) + '</a:solidFill>'
 				}
 
+				// if(chartType === CHART_TYPE.BAR && opts?.dataPointBorder?.isEnabled && data.length > 1 ) {
+				// 	const color = opts?.dataPointBorder?.BorderColor.replace('#','') || '000000';
+				// 	strXml += `<a:ln w="${valToPts(opts.dataPointBorder.BorderWidth)}"><a:solidFill><a:srgbClr val="${color}"/></a:solidFill></a:ln>`
+				// }
+
 				if (chartType === CHART_TYPE.LINE || chartType === CHART_TYPE.RADAR) {
 					if (opts.lineSize === 0) {
 						strXml += '<a:ln><a:noFill/></a:ln>'
@@ -826,6 +843,10 @@ function makeChartType(chartType: CHART_NAME, data: OptsChartData[], opts: IChar
 							strXml += '  </a:solidFill>'
 							strXml += '</a:ln>'
 						}
+						if(chartType === CHART_TYPE.BAR && opts.barGrouping === 'clustered' && opts?.dataPointBorder?.isEnabled) {
+							const color = opts?.dataPointBorder?.BorderColor.replace('#','') || '000000';
+							strXml += `<a:ln w="${valToPts(opts.dataPointBorder.BorderWidth)}"><a:solidFill><a:srgbClr val="${color}"/></a:solidFill></a:ln>`
+						}
 						strXml += createShadowElement(opts.shadow, DEF_SHAPE_SHADOW)
 						strXml += '    </c:spPr>'
 						strXml += '  </c:dPt>'
@@ -879,6 +900,66 @@ function makeChartType(chartType: CHART_NAME, data: OptsChartData[], opts: IChar
 
 				// Option: `smooth`
 				if (chartType === CHART_TYPE.LINE) strXml += '<c:smooth val="' + (opts.lineSmooth ? '1' : '0') + '"/>'
+
+				{
+					if (obj.valueLabels && obj.valueLabels.length && opts.dataLabelFormatBar == 'custom') {
+
+						strXml +='<c:dLbls>';
+						obj.values.forEach(function(value,index) {
+							if (opts.dataLabelFormatBar == 'custom') {
+								strXml +='<c:dLbl>';
+								strXml += ` <c:numFmt formatCode="${opts.dataLabelFormatCode || 'General'}" sourceLinked="0"/>`
+								strXml +='    <c:idx val="' + index + '"/>';
+								strXml +='    <c:tx>';
+								strXml +='      <c:rich>';
+								strXml +='				<a:bodyPr>';
+								strXml +='					<a:spAutoFit/>';
+								strXml +='				</a:bodyPr>';
+								strXml +='      	<a:lstStyle/>';
+								strXml +='      	<a:p>';
+								strXml += '      <a:pPr>'
+								strXml +=
+									'        <a:defRPr b="' + (opts.dataLabelFontBold ? 1 : 0) + '" i="0" strike="noStrike" sz="' + (opts.dataLabelFontSize || DEF_FONT_SIZE) + '00" u="none">'
+								strXml += '          <a:solidFill>' + createColorElement(obj.valueLabelsProp[index]?.color || opts.dataLabelColor || DEF_FONT_COLOR) + '</a:solidFill>'
+								strXml += '          <a:latin typeface="' + (opts.dataLabelFontFace || 'Arial') + '"/>'
+								strXml += '        </a:defRPr>'
+								strXml += '      </a:pPr>'
+								strXml +='      		<a:fld id="{' + getUuid('xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx') + '}" type="YVALUE">';
+								strXml +='      			<a:rPr lang="'+ (opts.lang || 'en-US') +'" baseline="0"/>';
+								strXml +='          	<a:t>[' + encodeXmlEntities(obj.name) + ']</a:t>';
+								strXml +='        	</a:fld>';
+								if(obj.valueLabelsProp[index]?.superscript) {
+									strXml +='        	<a:r>';
+									strXml +='        		<a:rPr lang="'+ (opts.lang || 'en-US') +'" dirty="0"/>';
+									strXml +='          	<a:t></a:t>';
+									strXml +='        	</a:r>';
+									strXml +='        	<a:r>';
+									strXml +='        		<a:rPr lang="'+ (opts.lang || 'en-US') +'" baseline="30000" dirty="0"/>';
+									strXml +='          	<a:t>'+ ' ' + encodeXmlEntities(obj.valueLabels[index]) +'</a:t>';
+									strXml +='        	</a:r>';
+								} else {
+									strXml +='        	<a:r>';
+									strXml +='        		<a:rPr lang="'+ (opts.lang || 'en-US') +'" dirty="0"/>';
+									strXml +='          	<a:t>'+ ' ' + encodeXmlEntities(obj.valueLabels[index]) +'</a:t>';
+									strXml +='        	</a:r>';
+								}
+								strXml +='        	<a:endParaRPr lang="'+ (opts.lang || 'en-US') +'" dirty="0"/>';
+								strXml +='      	</a:p>';
+								strXml +='      </c:rich>';
+								strXml +='    </c:tx>';
+								if (opts.dataLabelPosition) strXml += ' <c:dLblPos val="' + opts.dataLabelPosition + '"/>'
+								strXml +='    <c:showLegendKey val="0"/>';
+								strXml +='    <c:showCatName val="0"/>';
+								strXml +='    <c:showSerName val="0"/>';
+								strXml +='    <c:showPercent val="0"/>';
+								strXml +='    <c:showBubbleSize val="0"/>';
+								strXml +=`    <c:showLeaderLines val="${opts.showLeaderLines ? '1' : '0'}"/>`
+								strXml +='</c:dLbl>';
+							}
+						});
+						strXml +='</c:dLbls>';
+					}
+				}
 
 				// 4: Close "SERIES"
 				strXml += '</c:ser>'
@@ -1068,6 +1149,7 @@ function makeChartType(chartType: CHART_NAME, data: OptsChartData[], opts: IChar
 									strXml += '          	</a:fld>'
 									strXml += '          	<a:r>'
 									strXml += '          		<a:rPr lang="' + (opts.lang || 'en-US') + '" baseline="0" dirty="0"/>'
+									strXml +='          	<a:t>'+ ' ' + encodeXmlEntities(obj.valueLabels[idx]) +'</a:t>';
 									strXml += '          		<a:t>)</a:t>'
 									strXml += '          	</a:r>'
 									strXml += '          	<a:endParaRPr lang="' + (opts.lang || 'en-US') + '" dirty="0"/>'
@@ -1464,6 +1546,12 @@ function makeChartType(chartType: CHART_NAME, data: OptsChartData[], opts: IChar
 						opts.dataBorder.color
 					)}</a:solidFill><a:prstDash val="solid"/><a:round/></a:ln>`
 				}
+				if (opts?.dataPointBorder?.isEnabled) {
+					const color = opts?.dataPointBorder?.BorderColor.replace('#','') || '000000';
+					strXml += `<a:ln w="${valToPts(opts.dataPointBorder.BorderWidth)}" cap="flat"><a:solidFill>${createColorElement(
+						color
+					)}</a:solidFill><a:prstDash val="solid"/><a:round/></a:ln>`
+				}
 				strXml += createShadowElement(opts.shadow, DEF_SHAPE_SHADOW)
 				strXml += '  </c:spPr>'
 				strXml += '</c:dPt>'
@@ -1481,7 +1569,7 @@ function makeChartType(chartType: CHART_NAME, data: OptsChartData[], opts: IChar
 				strXml += `   <a:defRPr sz="${Math.round((opts.dataLabelFontSize || DEF_FONT_SIZE) * 100)}" b="${opts.dataLabelFontBold ? 1 : 0}" i="${
 					opts.dataLabelFontItalic ? 1 : 0
 				}" u="none" strike="noStrike">`
-				strXml += '    <a:solidFill>' + createColorElement(opts.dataLabelColor || DEF_FONT_COLOR) + '</a:solidFill>'
+				strXml += '    <a:solidFill>' + createColorElement(obj.valueLabelsProp[idx]?.color || opts.dataLabelColor || DEF_FONT_COLOR) + '</a:solidFill>'
 				strXml += `    <a:latin typeface="${opts.dataLabelFontFace || 'Arial'}"/>`
 				strXml += '   </a:defRPr>'
 				strXml += '      </a:pPr></a:p>'
@@ -1846,20 +1934,13 @@ function makeSerAxis(opts: IChartOptsLib, axisId: string, valAxisId: string): st
  * @param {IChartPropsTitle} opts - options
  * @return {string} XML `<c:title>`
  */
-function genXmlTitle(opts: IChartPropsTitle): string {
+function getTextMarkup(opts: IChartPropsTitle): string {
 	let align = opts.titleAlign === 'left' || opts.titleAlign === 'right' ? `<a:pPr algn="${opts.titleAlign.substring(0, 1)}">` : `<a:pPr>`
 	let rotate = opts.titleRotate ? `<a:bodyPr rot="${convertRotationDegrees(opts.titleRotate)}"/>` : `<a:bodyPr/>` // don't specify rotation to get default (ex. vertical for cat axis)
 	let sizeAttr = opts.fontSize ? 'sz="' + Math.round(opts.fontSize * 100) + '"' : '' // only set the font size if specified.  Powerpoint will handle the default size
 	let titleBold = opts.titleBold === true ? 1 : 0
-	let layout =
-		opts.titlePos && opts.titlePos.x && opts.titlePos.y
-			? `<c:layout><c:manualLayout><c:xMode val="edge"/><c:yMode val="edge"/><c:x val="${opts.titlePos.x}"/><c:y val="${opts.titlePos.y}"/></c:manualLayout></c:layout>`
-			: `<c:layout/>`
-
-	return `<c:title>
-	  <c:tx>
-	    <c:rich>
-	      ${rotate}
+	return `
+		      ${rotate}
 	      <a:lstStyle/>
 	      <a:p>
 	        ${align}
@@ -1875,7 +1956,21 @@ function genXmlTitle(opts: IChartPropsTitle): string {
 	        </a:rPr>
 	        <a:t>${encodeXmlEntities(opts.title) || ''}</a:t>
 	      </a:r>
-	    </a:p>
+	    </a:p>`
+}
+
+function genXmlTitle(opts: IChartPropsTitle, subTitles: IChartPropsTitle[] = []): string {
+	let layout =
+		opts.titlePos && opts.titlePos.x && opts.titlePos.y
+			? `<c:layout><c:manualLayout><c:xMode val="edge"/><c:yMode val="edge"/><c:x val="${opts.titlePos.x}"/><c:y val="${opts.titlePos.y}"/></c:manualLayout></c:layout>`
+			: `<c:layout/>`;
+
+	const titlesMarkup = [{...opts}, ...subTitles].reduce((acc, item) => acc += getTextMarkup(item), ``);
+
+	return `<c:title>
+	  <c:tx>
+	    <c:rich>
+	      ${titlesMarkup}
 	    </c:rich>
 	  </c:tx>
 	  ${layout}
