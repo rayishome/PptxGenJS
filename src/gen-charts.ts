@@ -452,6 +452,7 @@ export function makeXmlCharts(rel: ISlideRelChart): string {
 			titleBold: item.titleBold,
 			titlePos: item.titlePos,
 			titleRotate: item.titleRotate,
+			titleWeight: item.titleWeight
 		});
 
 		const subTitles = rel.opts.subTitles || [];
@@ -1938,7 +1939,12 @@ function getTextMarkup(opts: IChartPropsTitle): string {
 	let align = opts.titleAlign === 'left' || opts.titleAlign === 'right' ? `<a:pPr algn="${opts.titleAlign.substring(0, 1)}">` : `<a:pPr>`
 	let rotate = opts.titleRotate ? `<a:bodyPr rot="${convertRotationDegrees(opts.titleRotate)}"/>` : `<a:bodyPr/>` // don't specify rotation to get default (ex. vertical for cat axis)
 	let sizeAttr = opts.fontSize ? 'sz="' + Math.round(opts.fontSize * 100) + '"' : '' // only set the font size if specified.  Powerpoint will handle the default size
-	let titleBold = opts.titleBold === true ? 1 : 0
+	let titleBold = 0;
+	let i = 0;
+	let u = "none";
+	if(opts.titleWeight === 'italic' ) i = 1;
+	if(opts.titleWeight === 'bold') titleBold = 1;
+	if(opts.titleWeight === 'underline') u = "sng";
 	return `
 		      ${rotate}
 	      <a:lstStyle/>
@@ -1950,7 +1956,7 @@ function getTextMarkup(opts: IChartPropsTitle): string {
 	        </a:defRPr>
 	      </a:pPr>
 	      <a:r>
-	        <a:rPr ${sizeAttr} b="${titleBold}" i="0" u="none" strike="noStrike">
+	        <a:rPr ${sizeAttr} b="${titleBold}" i="${i}" u="${u}" strike="noStrike">
 	          <a:solidFill>${createColorElement(opts.color || DEF_FONT_COLOR)}</a:solidFill>
 	          <a:latin typeface="${opts.fontFace || 'Arial'}"/>
 	        </a:rPr>

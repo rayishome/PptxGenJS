@@ -1441,6 +1441,7 @@ export interface IChartPropsTitle extends TextBaseProps {
 	titleFontSize?: number
 	titlePos?: { x: number; y: number }
 	titleRotate?: number
+	titleWeight?: string
 }
 export interface IChartOpts
 	extends IChartPropsAxisCat,

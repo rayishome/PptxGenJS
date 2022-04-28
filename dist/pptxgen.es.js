@@ -1,4 +1,4 @@
-/* PptxGenJS 3.10.0 @ 2022-04-26T12:23:18.993Z */
+/* PptxGenJS 3.10.0 @ 2022-04-28T20:29:58.702Z */
 import JSZip from 'jszip';
 
 /*! *****************************************************************************
@@ -4897,6 +4897,7 @@ function makeXmlCharts(rel) {
             titleBold: item.titleBold,
             titlePos: item.titlePos,
             titleRotate: item.titleRotate,
+            titleWeight: item.titleWeight
         }); };
         var subTitles = rel.opts.subTitles || [];
         // OPTION: Title
@@ -6322,8 +6323,16 @@ function getTextMarkup(opts) {
     var align = opts.titleAlign === 'left' || opts.titleAlign === 'right' ? "<a:pPr algn=\"".concat(opts.titleAlign.substring(0, 1), "\">") : "<a:pPr>";
     var rotate = opts.titleRotate ? "<a:bodyPr rot=\"".concat(convertRotationDegrees(opts.titleRotate), "\"/>") : "<a:bodyPr/>"; // don't specify rotation to get default (ex. vertical for cat axis)
     var sizeAttr = opts.fontSize ? 'sz="' + Math.round(opts.fontSize * 100) + '"' : ''; // only set the font size if specified.  Powerpoint will handle the default size
-    var titleBold = opts.titleBold === true ? 1 : 0;
-    return "\n\t\t      ".concat(rotate, "\n\t      <a:lstStyle/>\n\t      <a:p>\n\t        ").concat(align, "\n\t        <a:defRPr ").concat(sizeAttr, " b=\"").concat(titleBold, "\" i=\"0\" u=\"none\" strike=\"noStrike\">\n\t          <a:solidFill>").concat(createColorElement(opts.color || DEF_FONT_COLOR), "</a:solidFill>\n\t          <a:latin typeface=\"").concat(opts.fontFace || 'Arial', "\"/>\n\t        </a:defRPr>\n\t      </a:pPr>\n\t      <a:r>\n\t        <a:rPr ").concat(sizeAttr, " b=\"").concat(titleBold, "\" i=\"0\" u=\"none\" strike=\"noStrike\">\n\t          <a:solidFill>").concat(createColorElement(opts.color || DEF_FONT_COLOR), "</a:solidFill>\n\t          <a:latin typeface=\"").concat(opts.fontFace || 'Arial', "\"/>\n\t        </a:rPr>\n\t        <a:t>").concat(encodeXmlEntities(opts.title) || '', "</a:t>\n\t      </a:r>\n\t    </a:p>");
+    var titleBold = 0;
+    var i = 0;
+    var u = "none";
+    if (opts.titleWeight === 'italic')
+        i = 1;
+    if (opts.titleWeight === 'bold')
+        titleBold = 1;
+    if (opts.titleWeight === 'underline')
+        u = "sng";
+    return "\n\t\t      ".concat(rotate, "\n\t      <a:lstStyle/>\n\t      <a:p>\n\t        ").concat(align, "\n\t        <a:defRPr ").concat(sizeAttr, " b=\"").concat(titleBold, "\" i=\"0\" u=\"none\" strike=\"noStrike\">\n\t          <a:solidFill>").concat(createColorElement(opts.color || DEF_FONT_COLOR), "</a:solidFill>\n\t          <a:latin typeface=\"").concat(opts.fontFace || 'Arial', "\"/>\n\t        </a:defRPr>\n\t      </a:pPr>\n\t      <a:r>\n\t        <a:rPr ").concat(sizeAttr, " b=\"").concat(titleBold, "\" i=\"").concat(i, "\" u=\"").concat(u, "\" strike=\"noStrike\">\n\t          <a:solidFill>").concat(createColorElement(opts.color || DEF_FONT_COLOR), "</a:solidFill>\n\t          <a:latin typeface=\"").concat(opts.fontFace || 'Arial', "\"/>\n\t        </a:rPr>\n\t        <a:t>").concat(encodeXmlEntities(opts.title) || '', "</a:t>\n\t      </a:r>\n\t    </a:p>");
 }
 function genXmlTitle(opts, subTitles) {
     if (subTitles === void 0) { subTitles = []; }
