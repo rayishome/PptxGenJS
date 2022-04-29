@@ -1,4 +1,4 @@
-/* PptxGenJS 3.10.0 @ 2022-04-28T20:29:58.702Z */
+/* PptxGenJS 3.10.0 @ 2022-04-29T19:16:51.129Z */
 import JSZip from 'jszip';
 
 /*! *****************************************************************************
@@ -5350,18 +5350,14 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                                 strXml += '        	</a:fld>';
                                 if ((_b = obj.valueLabelsProp[index]) === null || _b === void 0 ? void 0 : _b.superscript) {
                                     strXml += '        	<a:r>';
-                                    strXml += '        		<a:rPr lang="' + (opts.lang || 'en-US') + '" dirty="0"/>';
-                                    strXml += '          	<a:t></a:t>';
-                                    strXml += '        	</a:r>';
-                                    strXml += '        	<a:r>';
                                     strXml += '        		<a:rPr lang="' + (opts.lang || 'en-US') + '" baseline="30000" dirty="0"/>';
-                                    strXml += '          	<a:t>' + ' ' + encodeXmlEntities(obj.valueLabels[index]) + '</a:t>';
+                                    strXml += "          \t<a:t>".concat(encodeXmlEntities(obj.valueLabels[index]), "</a:t>");
                                     strXml += '        	</a:r>';
                                 }
                                 else {
                                     strXml += '        	<a:r>';
                                     strXml += '        		<a:rPr lang="' + (opts.lang || 'en-US') + '" dirty="0"/>';
-                                    strXml += '          	<a:t>' + ' ' + encodeXmlEntities(obj.valueLabels[index]) + '</a:t>';
+                                    strXml += "          \t<a:t>".concat(encodeXmlEntities(obj.valueLabels[index]), "</a:t>");
                                     strXml += '        	</a:r>';
                                 }
                                 strXml += '        	<a:endParaRPr lang="' + (opts.lang || 'en-US') + '" dirty="0"/>';

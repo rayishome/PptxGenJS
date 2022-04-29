@@ -931,17 +931,13 @@ function makeChartType(chartType: CHART_NAME, data: OptsChartData[], opts: IChar
 								strXml +='        	</a:fld>';
 								if(obj.valueLabelsProp[index]?.superscript) {
 									strXml +='        	<a:r>';
-									strXml +='        		<a:rPr lang="'+ (opts.lang || 'en-US') +'" dirty="0"/>';
-									strXml +='          	<a:t></a:t>';
-									strXml +='        	</a:r>';
-									strXml +='        	<a:r>';
 									strXml +='        		<a:rPr lang="'+ (opts.lang || 'en-US') +'" baseline="30000" dirty="0"/>';
-									strXml +='          	<a:t>'+ ' ' + encodeXmlEntities(obj.valueLabels[index]) +'</a:t>';
+									strXml +=`          	<a:t>${encodeXmlEntities(obj.valueLabels[index])}</a:t>`;
 									strXml +='        	</a:r>';
 								} else {
 									strXml +='        	<a:r>';
 									strXml +='        		<a:rPr lang="'+ (opts.lang || 'en-US') +'" dirty="0"/>';
-									strXml +='          	<a:t>'+ ' ' + encodeXmlEntities(obj.valueLabels[index]) +'</a:t>';
+									strXml +=`          	<a:t>${encodeXmlEntities(obj.valueLabels[index])}</a:t>`;
 									strXml +='        	</a:r>';
 								}
 								strXml +='        	<a:endParaRPr lang="'+ (opts.lang || 'en-US') +'" dirty="0"/>';
