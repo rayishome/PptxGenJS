@@ -1,4 +1,4 @@
-/* PptxGenJS 3.10.0 @ 2022-04-29T19:16:51.129Z */
+/* PptxGenJS 3.10.0 @ 2022-08-09T17:59:47.056Z */
 import JSZip from 'jszip';
 
 /*! *****************************************************************************
@@ -5125,6 +5125,7 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
             */
             var colorIndex_1 = -1; // Maintain the color index by region
             data.forEach(function (obj) {
+                var _a, _b;
                 colorIndex_1++;
                 var idx = obj.index;
                 strXml += '<c:ser>';
@@ -5151,10 +5152,10 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                 else {
                     strXml += '<a:solidFill>' + createColorElement(seriesColor) + '</a:solidFill>';
                 }
-                // if(chartType === CHART_TYPE.BAR && opts?.dataPointBorder?.isEnabled && data.length > 1 ) {
-                // 	const color = opts?.dataPointBorder?.BorderColor.replace('#','') || '000000';
-                // 	strXml += `<a:ln w="${valToPts(opts.dataPointBorder.BorderWidth)}"><a:solidFill><a:srgbClr val="${color}"/></a:solidFill></a:ln>`
-                // }
+                if (chartType === CHART_TYPE.BAR && ((_a = opts === null || opts === void 0 ? void 0 : opts.dataPointBorder) === null || _a === void 0 ? void 0 : _a.isEnabled) && data.length > 1) {
+                    var color = ((_b = opts === null || opts === void 0 ? void 0 : opts.dataPointBorder) === null || _b === void 0 ? void 0 : _b.BorderColor.replace('#', '')) || '000000';
+                    strXml += "<a:ln w=\"".concat(valToPts(opts.dataPointBorder.BorderWidth), "\"><a:solidFill><a:srgbClr val=\"").concat(color, "\"/></a:solidFill></a:ln>");
+                }
                 if (chartType === CHART_TYPE.LINE || chartType === CHART_TYPE.RADAR) {
                     if (opts.lineSize === 0) {
                         strXml += '<a:ln><a:noFill/></a:ln>';

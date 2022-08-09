@@ -726,10 +726,10 @@ function makeChartType(chartType: CHART_NAME, data: OptsChartData[], opts: IChar
 					strXml += '<a:solidFill>' + createColorElement(seriesColor) + '</a:solidFill>'
 				}
 
-				// if(chartType === CHART_TYPE.BAR && opts?.dataPointBorder?.isEnabled && data.length > 1 ) {
-				// 	const color = opts?.dataPointBorder?.BorderColor.replace('#','') || '000000';
-				// 	strXml += `<a:ln w="${valToPts(opts.dataPointBorder.BorderWidth)}"><a:solidFill><a:srgbClr val="${color}"/></a:solidFill></a:ln>`
-				// }
+				if(chartType === CHART_TYPE.BAR && opts?.dataPointBorder?.isEnabled && data.length > 1 ) {
+					const color = opts?.dataPointBorder?.BorderColor.replace('#','') || '000000';
+					strXml += `<a:ln w="${valToPts(opts.dataPointBorder.BorderWidth)}"><a:solidFill><a:srgbClr val="${color}"/></a:solidFill></a:ln>`
+				}
 
 				if (chartType === CHART_TYPE.LINE || chartType === CHART_TYPE.RADAR) {
 					if (opts.lineSize === 0) {
