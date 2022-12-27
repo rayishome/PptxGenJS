@@ -1,7 +1,7 @@
-/* PptxGenJS 3.12.0-beta @ 2022-09-09T03:12:15.279Z */
+/* PptxGenJS 3.12.0-beta @ 2022-12-27T14:07:40.653Z */
 import JSZip from 'jszip';
 
-/******************************************************************************
+/*! *****************************************************************************
 Copyright (c) Microsoft Corporation.
 
 Permission to use, copy, modify, and/or distribute this software for any
@@ -3557,6 +3557,8 @@ function addChartDefinition(target, type, data, opt) {
     if (!options.dataLabelFormatScatter && options._type === CHART_TYPE.SCATTER)
         options.dataLabelFormatScatter = 'custom';
     //
+    if (!options.dataLabelFormatBar && options._type === CHART_TYPE.BAR)
+        options.dataLabelFormatBar = 'custom';
     options.lineSize = typeof options.lineSize === 'number' ? options.lineSize : 2;
     options.valAxisMajorUnit = typeof options.valAxisMajorUnit === 'number' ? options.valAxisMajorUnit : null;
     if (options._type === CHART_TYPE.AREA || options._type === CHART_TYPE.BAR || options._type === CHART_TYPE.BAR3D || options._type === CHART_TYPE.LINE) {
@@ -4485,6 +4487,7 @@ var Slide = /** @class */ (function () {
     Slide.prototype.addChart = function (type, data, options) {
         // FUTURE: TODO-VERSION-4: Remove first arg - only take data and opts, with "type" required on opts
         // Set `_type` on IChartOptsLib as its what is used as object is passed around
+        // @ts-ignore
         var optionsWithType = options || {};
         optionsWithType._type = type;
         addChartDefinition(this, type, data, options);
@@ -5059,18 +5062,20 @@ function makeXmlCharts(rel) {
         strXml += '<c:date1904 val="0"/>'; // ppt defaults to 1904 dates, excel to 1900
         strXml += "<c:roundedCorners val=\"".concat(rel.opts.chartArea.roundedCorners ? '1' : '0', "\"/>");
         strXml += '<c:chart>';
+        var getFormattedDataTitle_1 = function (item) { return ({
+            title: item.title || 'Chart Title',
+            color: item.titleColor,
+            fontFace: item.titleFontFace,
+            fontSize: item.titleFontSize || DEF_FONT_TITLE_SIZE,
+            titleAlign: item.titleAlign,
+            titleBold: item.titleBold,
+            titlePos: item.titlePos,
+            titleRotate: item.titleRotate,
+        }); };
+        var subTitles = rel.opts.subTitles || [];
         // OPTION: Title
         if (rel.opts.showTitle) {
-            strXml += genXmlTitle({
-                title: rel.opts.title || 'Chart Title',
-                color: rel.opts.titleColor,
-                fontFace: rel.opts.titleFontFace,
-                fontSize: rel.opts.titleFontSize || DEF_FONT_TITLE_SIZE,
-                titleAlign: rel.opts.titleAlign,
-                titleBold: rel.opts.titleBold,
-                titlePos: rel.opts.titlePos,
-                titleRotate: rel.opts.titleRotate,
-            }, rel.opts.x, rel.opts.y);
+            strXml += genXmlTitle(getFormattedDataTitle_1(rel.opts), subTitles.map(function (i) { return getFormattedDataTitle_1(i); }), rel.opts.x, rel.opts.y);
             strXml += '<c:autoTitleDeleted val="0"/>';
         }
         else {
@@ -5314,7 +5319,7 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                 ]
              */
             data.forEach(function (obj) {
-                var _a;
+                var _a, _b, _c;
                 colorIndex++;
                 strXml += '<c:ser>';
                 strXml += "  <c:idx val=\"".concat(obj._dataIndex, "\"/><c:order val=\"").concat(obj._dataIndex, "\"/>");
@@ -5337,6 +5342,10 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                 }
                 else {
                     strXml += '<a:solidFill>' + createColorElement(seriesColor) + '</a:solidFill>';
+                }
+                if (chartType === CHART_TYPE.BAR && ((_a = opts === null || opts === void 0 ? void 0 : opts.dataPointBorder) === null || _a === void 0 ? void 0 : _a.isEnabled) && data.length > 1) {
+                    var color = ((_b = opts === null || opts === void 0 ? void 0 : opts.dataPointBorder) === null || _b === void 0 ? void 0 : _b.BorderColor.replace('#', '')) || '000000';
+                    strXml += "<a:ln w=\"".concat(valToPts(opts.dataPointBorder.BorderWidth), "\"><a:solidFill><a:srgbClr val=\"").concat(color, "\"/></a:solidFill></a:ln>");
                 }
                 if (chartType === CHART_TYPE.LINE || chartType === CHART_TYPE.RADAR) {
                     if (opts.lineSize === 0) {
@@ -5391,9 +5400,10 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                 // NOTE: `<c:dPt>` created with various colors will change PPT legend by design so each dataPt/color is an legend item!
                 if ((chartType === CHART_TYPE.BAR || chartType === CHART_TYPE.BAR3D) &&
                     data.length === 1 &&
-                    ((opts.chartColors && opts.chartColors !== BARCHART_COLORS && opts.chartColors.length > 1) || ((_a = opts.invertedColors) === null || _a === void 0 ? void 0 : _a.length))) {
+                    ((opts.chartColors && opts.chartColors !== BARCHART_COLORS && opts.chartColors.length > 1) || ((_c = opts.invertedColors) === null || _c === void 0 ? void 0 : _c.length))) {
                     // Series Data Point colors
                     obj.values.forEach(function (value, index) {
+                        var _a, _b;
                         var arrColors = value < 0 ? opts.invertedColors || opts.chartColors || BARCHART_COLORS : opts.chartColors || [];
                         strXml += '  <c:dPt>';
                         strXml += "    <c:idx val=\"".concat(index, "\"/>");
@@ -5414,6 +5424,10 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                             strXml += '   <a:srgbClr val="' + arrColors[index % arrColors.length] + '"/>';
                             strXml += '  </a:solidFill>';
                             strXml += '</a:ln>';
+                        }
+                        if (chartType === CHART_TYPE.BAR && opts.barGrouping === 'clustered' && ((_a = opts === null || opts === void 0 ? void 0 : opts.dataPointBorder) === null || _a === void 0 ? void 0 : _a.isEnabled)) {
+                            var color = ((_b = opts === null || opts === void 0 ? void 0 : opts.dataPointBorder) === null || _b === void 0 ? void 0 : _b.BorderColor.replace('#', '')) || '000000';
+                            strXml += "<a:ln w=\"".concat(valToPts(opts.dataPointBorder.BorderWidth), "\"><a:solidFill><a:srgbClr val=\"").concat(color, "\"/></a:solidFill></a:ln>");
                         }
                         strXml += createShadowElement(opts.shadow, DEF_SHAPE_SHADOW);
                         strXml += '    </c:spPr>';
@@ -5465,6 +5479,63 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                 // Option: `smooth`
                 if (chartType === CHART_TYPE.LINE)
                     strXml += '<c:smooth val="' + (opts.lineSmooth ? '1' : '0') + '"/>';
+                {
+                    if (obj.valueLabels && obj.valueLabels.length && opts.dataLabelFormatBar == 'custom') {
+                        strXml += '<c:dLbls>';
+                        obj.values.forEach(function (value, index) {
+                            var _a, _b;
+                            if (opts.dataLabelFormatBar == 'custom') {
+                                strXml += '<c:dLbl>';
+                                strXml += " <c:numFmt formatCode=\"".concat(opts.dataLabelFormatCode || 'General', "\" sourceLinked=\"0\"/>");
+                                strXml += '    <c:idx val="' + index + '"/>';
+                                strXml += '    <c:tx>';
+                                strXml += '      <c:rich>';
+                                strXml += '				<a:bodyPr>';
+                                strXml += '					<a:spAutoFit/>';
+                                strXml += '				</a:bodyPr>';
+                                strXml += '      	<a:lstStyle/>';
+                                strXml += '      	<a:p>';
+                                strXml += '      <a:pPr>';
+                                strXml +=
+                                    '        <a:defRPr b="' + (opts.dataLabelFontBold ? 1 : 0) + '" i="0" strike="noStrike" sz="' + (opts.dataLabelFontSize || DEF_FONT_SIZE) + '00" u="none">';
+                                strXml += '          <a:solidFill>' + createColorElement(((_a = obj.valueLabelsProp[index]) === null || _a === void 0 ? void 0 : _a.color) || opts.dataLabelColor || DEF_FONT_COLOR) + '</a:solidFill>';
+                                strXml += '          <a:latin typeface="' + (opts.dataLabelFontFace || 'Arial') + '"/>';
+                                strXml += '        </a:defRPr>';
+                                strXml += '      </a:pPr>';
+                                strXml += '      		<a:fld id="{' + getUuid('xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx') + '}" type="YVALUE">';
+                                strXml += '      			<a:rPr lang="' + (opts.lang || 'en-US') + '" baseline="0"/>';
+                                strXml += '          	<a:t>[' + encodeXmlEntities(obj.name) + ']</a:t>';
+                                strXml += '        	</a:fld>';
+                                if ((_b = obj.valueLabelsProp[index]) === null || _b === void 0 ? void 0 : _b.superscript) {
+                                    strXml += '        	<a:r>';
+                                    strXml += '        		<a:rPr lang="' + (opts.lang || 'en-US') + '" baseline="30000" dirty="0"/>';
+                                    strXml += "          \t<a:t>".concat(encodeXmlEntities(obj.valueLabels[index]), "</a:t>");
+                                    strXml += '        	</a:r>';
+                                }
+                                else {
+                                    strXml += '        	<a:r>';
+                                    strXml += '        		<a:rPr lang="' + (opts.lang || 'en-US') + '" dirty="0"/>';
+                                    strXml += "          \t<a:t>".concat(encodeXmlEntities(obj.valueLabels[index]), "</a:t>");
+                                    strXml += '        	</a:r>';
+                                }
+                                strXml += '        	<a:endParaRPr lang="' + (opts.lang || 'en-US') + '" dirty="0"/>';
+                                strXml += '      	</a:p>';
+                                strXml += '      </c:rich>';
+                                strXml += '    </c:tx>';
+                                if (opts.dataLabelPosition)
+                                    strXml += ' <c:dLblPos val="' + opts.dataLabelPosition + '"/>';
+                                strXml += '    <c:showLegendKey val="0"/>';
+                                strXml += '    <c:showCatName val="0"/>';
+                                strXml += '    <c:showSerName val="0"/>';
+                                strXml += '    <c:showPercent val="0"/>';
+                                strXml += '    <c:showBubbleSize val="0"/>';
+                                strXml += "    <c:showLeaderLines val=\"".concat(opts.showLeaderLines ? '1' : '0', "\"/>");
+                                strXml += '</c:dLbl>';
+                            }
+                        });
+                        strXml += '</c:dLbls>';
+                    }
+                }
                 // 4: Close "SERIES"
                 strXml += '</c:ser>';
             });
@@ -5627,6 +5698,7 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                                     strXml += '              </a:fld>';
                                     strXml += '              <a:r>';
                                     strXml += '                  <a:rPr lang="' + (opts.lang || 'en-US') + '" baseline="0" dirty="0"/>';
+                                    strXml += '          	<a:t>' + ' ' + encodeXmlEntities(obj.valueLabels[idx]) + '</a:t>';
                                     strXml += '                  <a:t>)</a:t>';
                                     strXml += '              </a:r>';
                                     strXml += '              <a:endParaRPr lang="' + (opts.lang || 'en-US') + '" dirty="0"/>';
@@ -5963,6 +6035,7 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
             // strXml += '<c:explosion val="0"/>'
             // 2: "Data Point" block for every data row
             optsChartData.labels[0].forEach(function (_label, idx) {
+                var _a, _b;
                 strXml += '<c:dPt>';
                 strXml += " <c:idx val=\"".concat(idx, "\"/>");
                 strXml += ' <c:bubble3D val="0"/>';
@@ -5971,6 +6044,10 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                 if (opts.dataBorder) {
                     strXml += "<a:ln w=\"".concat(valToPts(opts.dataBorder.pt), "\" cap=\"flat\"><a:solidFill>").concat(createColorElement(opts.dataBorder.color), "</a:solidFill><a:prstDash val=\"solid\"/><a:round/></a:ln>");
                 }
+                if ((_a = opts === null || opts === void 0 ? void 0 : opts.dataPointBorder) === null || _a === void 0 ? void 0 : _a.isEnabled) {
+                    var color = ((_b = opts === null || opts === void 0 ? void 0 : opts.dataPointBorder) === null || _b === void 0 ? void 0 : _b.BorderColor.replace('#', '')) || '000000';
+                    strXml += "<a:ln w=\"".concat(valToPts(opts.dataPointBorder.BorderWidth), "\" cap=\"flat\"><a:solidFill>").concat(createColorElement(color), "</a:solidFill><a:prstDash val=\"solid\"/><a:round/></a:ln>");
+                }
                 strXml += createShadowElement(opts.shadow, DEF_SHAPE_SHADOW);
                 strXml += '  </c:spPr>';
                 strXml += '</c:dPt>';
@@ -5978,6 +6055,7 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
             // 3: "Data Label" block for every data Label
             strXml += '<c:dLbls>';
             optsChartData.labels[0].forEach(function (_label, idx) {
+                var _a;
                 strXml += '<c:dLbl>';
                 strXml += " <c:idx val=\"".concat(idx, "\"/>");
                 strXml += "  <c:numFmt formatCode=\"".concat(encodeXmlEntities(opts.dataLabelFormatCode) || 'General', "\" sourceLinked=\"0\"/>");
@@ -5985,7 +6063,7 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                 strXml += '   <a:bodyPr/><a:lstStyle/>';
                 strXml += '   <a:p><a:pPr>';
                 strXml += "   <a:defRPr sz=\"".concat(Math.round((opts.dataLabelFontSize || DEF_FONT_SIZE) * 100), "\" b=\"").concat(opts.dataLabelFontBold ? 1 : 0, "\" i=\"").concat(opts.dataLabelFontItalic ? 1 : 0, "\" u=\"none\" strike=\"noStrike\">");
-                strXml += '    <a:solidFill>' + createColorElement(opts.dataLabelColor || DEF_FONT_COLOR) + '</a:solidFill>';
+                strXml += '    <a:solidFill>' + createColorElement(((_a = optsChartData.valueLabelsProp[idx]) === null || _a === void 0 ? void 0 : _a.color) || opts.dataLabelColor || DEF_FONT_COLOR) + '</a:solidFill>';
                 strXml += "    <a:latin typeface=\"".concat(opts.dataLabelFontFace || 'Arial', "\"/>");
                 strXml += '   </a:defRPr>';
                 strXml += '      </a:pPr></a:p>';
@@ -6355,11 +6433,23 @@ function makeSerAxis(opts, axisId, valAxisId) {
  * @param {IChartPropsTitle} opts - options
  * @return {string} XML `<c:title>`
  */
-function genXmlTitle(opts, chartX, chartY) {
-    var align = opts.titleAlign === 'left' || opts.titleAlign === 'right' ? "<a:pPr algn=\"".concat(opts.titleAlign.substring(0, 1), "\">") : '<a:pPr>';
-    var rotate = opts.titleRotate ? "<a:bodyPr rot=\"".concat(convertRotationDegrees(opts.titleRotate), "\"/>") : '<a:bodyPr/>'; // don't specify rotation to get default (ex. vertical for cat axis)
-    var sizeAttr = opts.fontSize ? "sz=\"".concat(Math.round(opts.fontSize * 100), "\"") : ''; // only set the font size if specified.  Powerpoint will handle the default size
-    var titleBold = opts.titleBold ? 1 : 0;
+function getTextMarkup(opts) {
+    var align = opts.titleAlign === 'left' || opts.titleAlign === 'right' ? "<a:pPr algn=\"".concat(opts.titleAlign.substring(0, 1), "\">") : "<a:pPr>";
+    var rotate = opts.titleRotate ? "<a:bodyPr rot=\"".concat(convertRotationDegrees(opts.titleRotate), "\"/>") : "<a:bodyPr/>"; // don't specify rotation to get default (ex. vertical for cat axis)
+    var sizeAttr = opts.fontSize ? 'sz="' + Math.round(opts.fontSize * 100) + '"' : ''; // only set the font size if specified.  Powerpoint will handle the default size
+    var titleBold = 0;
+    var i = 0;
+    var u = "none";
+    if (opts.titleWeight === 'italic')
+        i = 1;
+    if (opts.titleWeight === 'bold')
+        titleBold = 1;
+    if (opts.titleWeight === 'underline')
+        u = "sng";
+    return "\n\t\t      ".concat(rotate, "\n\t      <a:lstStyle/>\n\t      <a:p>\n\t        ").concat(align, "\n\t        <a:defRPr ").concat(sizeAttr, " b=\"").concat(titleBold, "\" i=\"0\" u=\"none\" strike=\"noStrike\">\n\t          <a:solidFill>").concat(createColorElement(opts.color || DEF_FONT_COLOR), "</a:solidFill>\n\t          <a:latin typeface=\"").concat(opts.fontFace || 'Arial', "\"/>\n\t        </a:defRPr>\n\t      </a:pPr>\n\t      <a:r>\n\t        <a:rPr ").concat(sizeAttr, " b=\"").concat(titleBold, "\" i=\"").concat(i, "\" u=\"").concat(u, "\" strike=\"noStrike\">\n\t          <a:solidFill>").concat(createColorElement(opts.color || DEF_FONT_COLOR), "</a:solidFill>\n\t          <a:latin typeface=\"").concat(opts.fontFace || 'Arial', "\"/>\n\t        </a:rPr>\n\t        <a:t>").concat(encodeXmlEntities(opts.title) || '', "</a:t>\n\t      </a:r>\n\t    </a:p>");
+}
+function genXmlTitle(opts, subTitles, chartX, chartY) {
+    if (subTitles === void 0) { subTitles = []; }
     var layout = '<c:layout/>';
     if (opts.titlePos && typeof opts.titlePos.x === 'number' && typeof opts.titlePos.y === 'number') {
         // NOTE: manualLayout x/y vals are *relative to entire slide*
@@ -6377,7 +6467,8 @@ function genXmlTitle(opts, chartX, chartY) {
             valY = valY / 10;
         layout = "<c:layout><c:manualLayout><c:xMode val=\"edge\"/><c:yMode val=\"edge\"/><c:x val=\"".concat(valX, "\"/><c:y val=\"").concat(valY, "\"/></c:manualLayout></c:layout>");
     }
-    return "<c:title>\n      <c:tx>\n        <c:rich>\n          ".concat(rotate, "\n          <a:lstStyle/>\n          <a:p>\n            ").concat(align, "\n            <a:defRPr ").concat(sizeAttr, " b=\"").concat(titleBold, "\" i=\"0\" u=\"none\" strike=\"noStrike\">\n              <a:solidFill>").concat(createColorElement(opts.color || DEF_FONT_COLOR), "</a:solidFill>\n              <a:latin typeface=\"").concat(opts.fontFace || 'Arial', "\"/>\n            </a:defRPr>\n          </a:pPr>\n          <a:r>\n            <a:rPr ").concat(sizeAttr, " b=\"").concat(titleBold, "\" i=\"0\" u=\"none\" strike=\"noStrike\">\n              <a:solidFill>").concat(createColorElement(opts.color || DEF_FONT_COLOR), "</a:solidFill>\n              <a:latin typeface=\"").concat(opts.fontFace || 'Arial', "\"/>\n            </a:rPr>\n            <a:t>").concat(encodeXmlEntities(opts.title) || '', "</a:t>\n          </a:r>\n        </a:p>\n        </c:rich>\n      </c:tx>\n      ").concat(layout, "\n      <c:overlay val=\"0\"/>\n    </c:title>");
+    var titlesMarkup = __spreadArray([__assign({}, opts)], subTitles, true).reduce(function (acc, item) { return acc += getTextMarkup(item); }, "");
+    return "<c:title>\n\t  <c:tx>\n\t    <c:rich>\n\t      ".concat(titlesMarkup, "\n\t    </c:rich>\n\t  </c:tx>\n\t  ").concat(layout, "\n\t  <c:overlay val=\"0\"/>\n\t</c:title>");
 }
 /**
  * Calc and return excel column name for a given column length

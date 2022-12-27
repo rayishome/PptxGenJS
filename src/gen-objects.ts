@@ -336,7 +336,9 @@ export function addChartDefinition (target: PresSlide, type: CHART_NAME | IChart
 	// Set default format for Scatter chart labels to custom string if not defined
 	if (!options.dataLabelFormatScatter && options._type === CHART_TYPE.SCATTER) options.dataLabelFormatScatter = 'custom'
 	//
-	options.lineSize = typeof options.lineSize === 'number' ? options.lineSize : 2
+  if ( !options.dataLabelFormatBar && options._type === CHART_TYPE.BAR) options.dataLabelFormatBar = 'custom';
+  
+  options.lineSize = typeof options.lineSize === 'number' ? options.lineSize : 2
 	options.valAxisMajorUnit = typeof options.valAxisMajorUnit === 'number' ? options.valAxisMajorUnit : null
 
 	if (options._type === CHART_TYPE.AREA || options._type === CHART_TYPE.BAR || options._type === CHART_TYPE.BAR3D || options._type === CHART_TYPE.LINE) {
