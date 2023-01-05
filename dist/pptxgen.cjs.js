@@ -1,4 +1,4 @@
-/* PptxGenJS 3.12.0-beta @ 2022-12-27T14:07:40.651Z */
+/* PptxGenJS 3.12.0-beta @ 2023-01-05T13:26:42.953Z */
 'use strict';
 
 var JSZip = require('jszip');
@@ -5491,8 +5491,12 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                         obj.values.forEach(function (value, index) {
                             var _a, _b;
                             if (opts.dataLabelFormatBar == 'custom') {
+                                var formatCode = opts.dataLabelFormatCode;
+                                if (obj.dataLabelFormatCode && obj.dataLabelFormatCode[index]) {
+                                    formatCode = obj.dataLabelFormatCode[index];
+                                }
                                 strXml += '<c:dLbl>';
-                                strXml += " <c:numFmt formatCode=\"".concat(opts.dataLabelFormatCode || 'General', "\" sourceLinked=\"0\"/>");
+                                strXml += " <c:numFmt formatCode=\"".concat(formatCode || 'General', "\" sourceLinked=\"0\"/>");
                                 strXml += '    <c:idx val="' + index + '"/>';
                                 strXml += '    <c:tx>';
                                 strXml += '      <c:rich>';

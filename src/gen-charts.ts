@@ -1011,8 +1011,12 @@ function makeChartType (chartType: CHART_NAME, data: IOptsChartData[], opts: ICh
 						strXml +='<c:dLbls>';
 						obj.values.forEach(function(value,index) {
 							if (opts.dataLabelFormatBar == 'custom') {
+								let formatCode = opts.dataLabelFormatCode;
+								if(obj.dataLabelFormatCode && obj.dataLabelFormatCode[index]) {
+									formatCode = obj.dataLabelFormatCode[index];
+								}
 								strXml +='<c:dLbl>';
-								strXml += ` <c:numFmt formatCode="${opts.dataLabelFormatCode || 'General'}" sourceLinked="0"/>`
+								strXml += ` <c:numFmt formatCode="${formatCode || 'General'}" sourceLinked="0"/>`
 								strXml +='    <c:idx val="' + index + '"/>';
 								strXml +='    <c:tx>';
 								strXml +='      <c:rich>';

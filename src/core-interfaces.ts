@@ -1138,7 +1138,8 @@ export interface OptsChartData {
 	 */
 	values?: number[]
 	valueLabels?: string[]
-	valueLabelsProp?: OptsValueLabel[]
+	valueLabelsProp?: OptsValueLabel[],
+	dataLabelFormatCode?: string[]
 	/**
 	 * Override `chartColors`
 	 */
