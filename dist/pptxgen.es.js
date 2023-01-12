@@ -1,4 +1,4 @@
-/* PptxGenJS 3.12.0-beta @ 2023-01-05T13:26:42.956Z */
+/* PptxGenJS 3.12.0-beta @ 2023-01-12T12:16:01.728Z */
 import JSZip from 'jszip';
 
 /*! *****************************************************************************
@@ -1945,6 +1945,7 @@ function slideObjectToXml(slide) {
                 strSlideXml += '<p:sp>';
                 // B: The addition of the "txBox" attribute is the sole determiner of if an object is a shape or textbox
                 strSlideXml += "<p:nvSpPr><p:cNvPr id=\"".concat(idx + 2, "\" name=\"").concat(slideItemObj.options.objectName, "\">");
+                strSlideXml += "<p:nvPr><p:custDataLst><p:tags r:id=\"rId".concat(slide === null || slide === void 0 ? void 0 : slide._rId, "_").concat(idx, "\"/></p:custDataLst></p:nvPr>");
                 // <Hyperlink>
                 if ((_c = slideItemObj.options.hyperlink) === null || _c === void 0 ? void 0 : _c.url) {
                     strSlideXml += "<a:hlinkClick r:id=\"rId".concat(slideItemObj.options.hyperlink._rId, "\" tooltip=\"").concat(slideItemObj.options.hyperlink.tooltip ? encodeXmlEntities(slideItemObj.options.hyperlink.tooltip) : '', "\"/>");
@@ -2163,7 +2164,9 @@ function slideObjectToXml(slide) {
                 strSlideXml += ' <p:nvGraphicFramePr>';
                 strSlideXml += "   <p:cNvPr id=\"".concat(idx + 2, "\" name=\"").concat(slideItemObj.options.objectName, "\" descr=\"").concat(encodeXmlEntities(slideItemObj.options.altText || ''), "\"/>");
                 strSlideXml += '   <p:cNvGraphicFramePr/>';
-                strSlideXml += "   <p:nvPr>".concat(genXmlPlaceholder(placeholderObj), "</p:nvPr>");
+                strSlideXml += "   <p:nvPr>".concat(genXmlPlaceholder(placeholderObj));
+                strSlideXml += "   <p:nvPr><p:custDataLst><p:tags r:id=\"rId".concat(slide === null || slide === void 0 ? void 0 : slide._rId, "_").concat(idx, "\"/></p:custDataLst></p:nvPr>");
+                strSlideXml += "</p:nvPr>";
                 strSlideXml += ' </p:nvGraphicFramePr>';
                 strSlideXml += " <p:xfrm><a:off x=\"".concat(x, "\" y=\"").concat(y, "\"/><a:ext cx=\"").concat(cx, "\" cy=\"").concat(cy, "\"/></p:xfrm>");
                 strSlideXml += ' <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">';
@@ -2252,7 +2255,7 @@ function slideObjectToXml(slide) {
  * @param {{ target: string; type: string }[]} defaultRels - array of default relations
  * @return {string} XML
  */
-function slideObjectRelationsToXml(slide, defaultRels) {
+function slideObjectRelationsToXml(slide, defaultRels, tagsKeysArray) {
     var lastRid = 0; // stores maximum rId used for dynamic relations
     var strXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' + CRLF + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">';
     // STEP 1: Add all rels for this Slide
@@ -2312,6 +2315,11 @@ function slideObjectRelationsToXml(slide, defaultRels) {
     defaultRels.forEach(function (rel, idx) {
         strXml += "<Relationship Id=\"rId".concat(lastRid + idx + 1, "\" Type=\"").concat(rel.type, "\" Target=\"").concat(rel.target, "\"/>");
     });
+    if (tagsKeysArray && tagsKeysArray.length) {
+        tagsKeysArray.forEach(function (key) {
+            return strXml += "<Relationship Id=\"rId".concat(key, "\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/tags\" Target=\"../tags/tag").concat(key, ".xml\"/>");
+        });
+    }
     strXml += '</Relationships>';
     return strXml;
 }
@@ -3068,7 +3076,7 @@ function makeXmlSlideLayoutRel(layoutNumber, slideLayouts) {
  * @param {number} `slideNumber` 1-indexed number of a layout that relations are generated for
  * @return {string} XML
  */
-function makeXmlSlideRel(slides, slideLayouts, slideNumber) {
+function makeXmlSlideRel(slides, slideLayouts, slideNumber, tagsKeysArray) {
     return slideObjectRelationsToXml(slides[slideNumber - 1], [
         {
             target: "../slideLayouts/slideLayout".concat(getLayoutIdxForSlide(slides, slideLayouts, slideNumber), ".xml"),
@@ -3078,7 +3086,7 @@ function makeXmlSlideRel(slides, slideLayouts, slideNumber) {
             target: "../notesSlides/notesSlide".concat(slideNumber, ".xml"),
             type: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/notesSlide',
         },
-    ]);
+    ], tagsKeysArray);
 }
 /**
  * Generates XML string for a slide relation file.
@@ -3127,6 +3135,15 @@ function getLayoutIdxForSlide(slides, slideLayouts, slideNumber) {
     return 1;
 }
 // XML-GEN: Last 5 functions create root /ppt files
+function makeTagXml(config) {
+    var binderId = (config === null || config === void 0 ? void 0 : config.BinderID) || 'binderId';
+    var binderTabID = (config === null || config === void 0 ? void 0 : config.BinderTabID) || 'TabId';
+    var binderTabName = (config === null || config === void 0 ? void 0 : config.BinderTabName) || 'TabName';
+    var binderChartObject = (config === null || config === void 0 ? void 0 : config.BinderChartObject) || 'Info';
+    var binderChartName = (config === null || config === void 0 ? void 0 : config.BinderChartName) || 'ChartName';
+    var binderChartID = (config === null || config === void 0 ? void 0 : config.BinderChartID) || 'ID';
+    return "<p:tagLst xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\">\n\t\t<p:tag name=\"BINDERID\" val=\"".concat(binderId, "\" />\n\t\t<p:tag name=\"BINDERTABID\" val=\"").concat(binderTabID, "\" />\n\t\t<p:tag name=\"BINDERTABNAME\" val=\"").concat(binderTabName, "\" />\n\t\t<p:tag name=\"BINDERCHARTNAME\" val=\"").concat(binderChartName, "\" />\n\t\t<p:tag name=\"BINDERCHARTOBJECT\" val=\"").concat(binderChartObject, "\" />\n\t\t<p:tag name=\"CHARTIDENTIFIER\" val=\"").concat(binderChartID, "\" />\n\t</p:tagLst>");
+}
 /**
  * Creates `ppt/theme/theme1.xml`
  * @return {string} XML
@@ -6890,6 +6907,7 @@ var PptxGenJS = /** @class */ (function () {
                                             zip.folder('ppt/slideMasters').folder('_rels');
                                             zip.folder('ppt/slides').folder('_rels');
                                             zip.folder('ppt/theme');
+                                            zip.folder('ppt/tags');
                                             zip.folder('ppt/notesMasters').folder('_rels');
                                             zip.folder('ppt/notesSlides').folder('_rels');
                                             zip.file('[Content_Types].xml', makeXmlContTypes(this.slides, this.slideLayouts, this.masterSlide)); // TODO: pass only `this` like below! 20200206
@@ -6908,8 +6926,17 @@ var PptxGenJS = /** @class */ (function () {
                                                 zip.file("ppt/slideLayouts/_rels/slideLayout".concat(idx + 1, ".xml.rels"), makeXmlSlideLayoutRel(idx + 1, _this.slideLayouts));
                                             });
                                             this.slides.forEach(function (slide, idx) {
+                                                var tagsKeysArray = [];
+                                                slide._slideObjects.forEach(function (object, indexObject) {
+                                                    var _a;
+                                                    var key = "".concat(slide._rId, "_").concat(indexObject);
+                                                    tagsKeysArray.push(key);
+                                                    var infoKey = object._type === 'text' ? 'textTag' : 'chartTag';
+                                                    var tagInfo = (_a = object === null || object === void 0 ? void 0 : object.options) === null || _a === void 0 ? void 0 : _a.tagsInfo[infoKey];
+                                                    zip.file("ppt/tags/tag".concat(key, ".xml"), makeTagXml(tagInfo || null));
+                                                }); // add arg to generate tagXml
                                                 zip.file("ppt/slides/slide".concat(idx + 1, ".xml"), makeXmlSlide(slide));
-                                                zip.file("ppt/slides/_rels/slide".concat(idx + 1, ".xml.rels"), makeXmlSlideRel(_this.slides, _this.slideLayouts, idx + 1));
+                                                zip.file("ppt/slides/_rels/slide".concat(idx + 1, ".xml.rels"), makeXmlSlideRel(_this.slides, _this.slideLayouts, idx + 1, tagsKeysArray));
                                                 // Create all slide notes related items. Notes of empty strings are created for slides which do not have notes specified, to keep track of _rels.
                                                 zip.file("ppt/notesSlides/notesSlide".concat(idx + 1, ".xml"), makeXmlNotesSlide(slide));
                                                 zip.file("ppt/notesSlides/_rels/notesSlide".concat(idx + 1, ".xml.rels"), makeXmlNotesSlideRel(idx + 1));

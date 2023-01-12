@@ -495,6 +495,7 @@ export default class PptxGenJS implements IPresentationProps {
 			zip.folder('ppt/slideMasters').folder('_rels')
 			zip.folder('ppt/slides').folder('_rels')
 			zip.folder('ppt/theme')
+			zip.folder('ppt/tags')
 			zip.folder('ppt/notesMasters').folder('_rels')
 			zip.folder('ppt/notesSlides').folder('_rels')
 			zip.file('[Content_Types].xml', genXml.makeXmlContTypes(this.slides, this.slideLayouts, this.masterSlide)) // TODO: pass only `this` like below! 20200206
@@ -514,8 +515,16 @@ export default class PptxGenJS implements IPresentationProps {
 				zip.file(`ppt/slideLayouts/_rels/slideLayout${idx + 1}.xml.rels`, genXml.makeXmlSlideLayoutRel(idx + 1, this.slideLayouts))
 			})
 			this.slides.forEach((slide, idx) => {
+				const tagsKeysArray = [];
+				slide._slideObjects.forEach((object, indexObject) => {
+					const key = `${slide._rId}_${indexObject}`;
+					tagsKeysArray.push(key);
+					const infoKey = object._type === 'text' ? 'textTag' : 'chartTag'
+					const tagInfo = object?.options?.tagsInfo[infoKey];
+					zip.file(`ppt/tags/tag${key}.xml`, genXml.makeTagXml(tagInfo || null));
+				}) // add arg to generate tagXml
 				zip.file(`ppt/slides/slide${idx + 1}.xml`, genXml.makeXmlSlide(slide))
-				zip.file(`ppt/slides/_rels/slide${idx + 1}.xml.rels`, genXml.makeXmlSlideRel(this.slides, this.slideLayouts, idx + 1))
+				zip.file(`ppt/slides/_rels/slide${idx + 1}.xml.rels`, genXml.makeXmlSlideRel(this.slides, this.slideLayouts, idx + 1, tagsKeysArray))
 				// Create all slide notes related items. Notes of empty strings are created for slides which do not have notes specified, to keep track of _rels.
 				zip.file(`ppt/notesSlides/notesSlide${idx + 1}.xml`, genXml.makeXmlNotesSlide(slide))
 				zip.file(`ppt/notesSlides/_rels/notesSlide${idx + 1}.xml.rels`, genXml.makeXmlNotesSlideRel(idx + 1))

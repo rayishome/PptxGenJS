@@ -999,6 +999,7 @@ export interface TextPropsOptions extends PositionProps, DataOrPathProps, TextBa
 	indentLevel?: number
 	isTextBox?: boolean
 	line?: ShapeLineProps
+	tagsInfo?: object
 	/**
 	 * Line spacing (pt)
 	 * - PowerPoint: Paragraph > Indents and Spacing > Line Spacing: > "Exactly"
@@ -1778,6 +1779,7 @@ export interface SlideLayout extends SlideBaseProps {
 		color: string
 		hidden?: boolean
 	}
+	_rId?: any
 }
 export interface PresSlide extends SlideBaseProps {
 	_rId: number

@@ -410,6 +410,7 @@ function slideObjectToXml (slide: PresSlide | SlideLayout): string {
 
 				// B: The addition of the "txBox" attribute is the sole determiner of if an object is a shape or textbox
 				strSlideXml += `<p:nvSpPr><p:cNvPr id="${idx + 2}" name="${slideItemObj.options.objectName}">`
+        strSlideXml += `<p:nvPr><p:custDataLst><p:tags r:id="rId${slide?._rId}_${idx}"/></p:custDataLst></p:nvPr>`
 				// <Hyperlink>
 				if (slideItemObj.options.hyperlink?.url) {
 					strSlideXml += `<a:hlinkClick r:id="rId${slideItemObj.options.hyperlink._rId}" tooltip="${slideItemObj.options.hyperlink.tooltip ? encodeXmlEntities(slideItemObj.options.hyperlink.tooltip) : ''}"/>`
@@ -664,7 +665,9 @@ function slideObjectToXml (slide: PresSlide | SlideLayout): string {
 				strSlideXml += ' <p:nvGraphicFramePr>'
 				strSlideXml += `   <p:cNvPr id="${idx + 2}" name="${slideItemObj.options.objectName}" descr="${encodeXmlEntities(slideItemObj.options.altText || '')}"/>`
 				strSlideXml += '   <p:cNvGraphicFramePr/>'
-				strSlideXml += `   <p:nvPr>${genXmlPlaceholder(placeholderObj)}</p:nvPr>`
+				strSlideXml += `   <p:nvPr>${genXmlPlaceholder(placeholderObj)}`
+				strSlideXml += `   <p:nvPr><p:custDataLst><p:tags r:id="rId${slide?._rId}_${idx}"/></p:custDataLst></p:nvPr>`
+				strSlideXml += `</p:nvPr>`
 				strSlideXml += ' </p:nvGraphicFramePr>'
 				strSlideXml += ` <p:xfrm><a:off x="${x}" y="${y}"/><a:ext cx="${cx}" cy="${cy}"/></p:xfrm>`
 				strSlideXml += ' <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">'
@@ -750,7 +753,7 @@ function slideObjectToXml (slide: PresSlide | SlideLayout): string {
  * @param {{ target: string; type: string }[]} defaultRels - array of default relations
  * @return {string} XML
  */
-function slideObjectRelationsToXml (slide: PresSlide | SlideLayout, defaultRels: Array<{ target: string, type: string }>): string {
+function slideObjectRelationsToXml (slide: PresSlide | SlideLayout, defaultRels: Array<{ target: string, type: string }>, tagsKeysArray?: Array<string>): string {
 	let lastRid = 0 // stores maximum rId used for dynamic relations
 	let strXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' + CRLF + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
 
@@ -804,6 +807,12 @@ function slideObjectRelationsToXml (slide: PresSlide | SlideLayout, defaultRels:
 	defaultRels.forEach((rel, idx) => {
 		strXml += `<Relationship Id="rId${lastRid + idx + 1}" Type="${rel.type}" Target="${rel.target}"/>`
 	})
+
+	if(tagsKeysArray && tagsKeysArray.length) {
+		tagsKeysArray.forEach(key =>
+			strXml +=	`<Relationship Id="rId${key}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/tags" Target="../tags/tag${key}.xml"/>`
+		)
+	}
 
 	strXml += '</Relationships>'
 	return strXml
@@ -1668,7 +1677,7 @@ export function makeXmlSlideLayoutRel (layoutNumber: number, slideLayouts: Slide
  * @param {number} `slideNumber` 1-indexed number of a layout that relations are generated for
  * @return {string} XML
  */
-export function makeXmlSlideRel (slides: PresSlide[], slideLayouts: SlideLayout[], slideNumber: number): string {
+export function makeXmlSlideRel (slides: PresSlide[], slideLayouts: SlideLayout[], slideNumber: number, tagsKeysArray: Array<string>): string {
 	return slideObjectRelationsToXml(slides[slideNumber - 1], [
 		{
 			target: `../slideLayouts/slideLayout${getLayoutIdxForSlide(slides, slideLayouts, slideNumber)}.xml`,
@@ -1678,7 +1687,7 @@ export function makeXmlSlideRel (slides: PresSlide[], slideLayouts: SlideLayout[
 			target: `../notesSlides/notesSlide${slideNumber}.xml`,
 			type: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/notesSlide',
 		},
-	])
+	], tagsKeysArray)
 }
 
 /**
@@ -1740,6 +1749,23 @@ function getLayoutIdxForSlide (slides: PresSlide[], slideLayouts: SlideLayout[],
 }
 
 // XML-GEN: Last 5 functions create root /ppt files
+
+export function makeTagXml (config?): string {
+	const binderId = config?.BinderID || 'binderId';
+	const binderTabID = config?.BinderTabID || 'TabId';
+	const binderTabName = config?.BinderTabName || 'TabName';
+	const binderChartObject = config?.BinderChartObject || 'Info';
+	const binderChartName = config?.BinderChartName || 'ChartName';
+	const binderChartID = config?.BinderChartID || 'ID';
+	return `<p:tagLst xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+		<p:tag name="BINDERID" val="${binderId}" />
+		<p:tag name="BINDERTABID" val="${binderTabID}" />
+		<p:tag name="BINDERTABNAME" val="${binderTabName}" />
+		<p:tag name="BINDERCHARTNAME" val="${binderChartName}" />
+		<p:tag name="BINDERCHARTOBJECT" val="${binderChartObject}" />
+		<p:tag name="CHARTIDENTIFIER" val="${binderChartID}" />
+	</p:tagLst>`
+}
 
 /**
  * Creates `ppt/theme/theme1.xml`
