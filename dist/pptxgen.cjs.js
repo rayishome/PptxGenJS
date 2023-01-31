@@ -1,4 +1,4 @@
-/* PptxGenJS 3.12.0-beta @ 2023-01-12T12:16:01.724Z */
+/* PptxGenJS 3.12.0-beta @ 2023-01-31T12:07:11.374Z */
 'use strict';
 
 var JSZip = require('jszip');
@@ -5094,6 +5094,7 @@ function makeXmlCharts(rel) {
             titleBold: item.titleBold,
             titlePos: item.titlePos,
             titleRotate: item.titleRotate,
+            titleWeight: item.titleWeight,
         }); };
         var subTitles = rel.opts.subTitles || [];
         // OPTION: Title

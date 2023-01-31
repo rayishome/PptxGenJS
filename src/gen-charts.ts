@@ -574,6 +574,7 @@ export function makeXmlCharts (rel: ISlideRelChart): string {
 			titleBold: item.titleBold,
 			titlePos: item.titlePos,
 			titleRotate: item.titleRotate,
+			titleWeight: item.titleWeight,
 		});
 
 		const subTitles = rel.opts.subTitles || [];
