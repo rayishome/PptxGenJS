@@ -1,4 +1,4 @@
-/* PptxGenJS 3.12.0-beta @ 2023-01-31T12:07:11.374Z */
+/* PptxGenJS 3.12.0-beta @ 2023-02-16T15:31:46.738Z */
 'use strict';
 
 var JSZip = require('jszip');
@@ -3148,7 +3148,8 @@ function makeTagXml(config) {
     var binderChartObject = (config === null || config === void 0 ? void 0 : config.BinderChartObject) || 'Info';
     var binderChartName = (config === null || config === void 0 ? void 0 : config.BinderChartName) || 'ChartName';
     var binderChartID = (config === null || config === void 0 ? void 0 : config.BinderChartID) || 'ID';
-    return "<p:tagLst xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\">\n\t\t<p:tag name=\"BINDERID\" val=\"".concat(binderId, "\" />\n\t\t<p:tag name=\"BINDERTABID\" val=\"").concat(binderTabID, "\" />\n\t\t<p:tag name=\"BINDERTABNAME\" val=\"").concat(binderTabName, "\" />\n\t\t<p:tag name=\"BINDERCHARTNAME\" val=\"").concat(binderChartName, "\" />\n\t\t<p:tag name=\"BINDERCHARTOBJECT\" val=\"").concat(binderChartObject, "\" />\n\t\t<p:tag name=\"CHARTIDENTIFIER\" val=\"").concat(binderChartID, "\" />\n\t</p:tagLst>");
+    var tabBinderInfo = (config === null || config === void 0 ? void 0 : config.TabBinderInfo) || '{DatasetID: DatasetID, GroupID: GroupID}';
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n\t\t<p:tagLst \n\t\t\txmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"\n\t\t \txmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\">\n\t\t<p:tag name=\"BINDERID\" val=\"".concat(binderId, "\" />\n\t\t<p:tag name=\"BINDERTABID\" val=\"").concat(binderTabID, "\" />\n\t\t<p:tag name=\"BINDERTABNAME\" val=\"").concat(binderTabName, "\" />\n\t\t<p:tag name=\"BINDERCHARTNAME\" val=\"").concat(binderChartName, "\" />\n\t\t<p:tag name=\"BINDERCHARTOBJECT\" val='").concat(binderChartObject, "' />\n\t\t<p:tag name=\"CHARTIDENTIFIER\" val=\"").concat(binderChartID, "\" />\n\t\t<p:tag name=\"BINDERCHARTID\" val=\"").concat(binderChartID, "\" />\n\t\t<p:tag name=\"TABBINDERINFO\" val='").concat(tabBinderInfo, "' />\n\t</p:tagLst>");
 }
 /**
  * Creates `ppt/theme/theme1.xml`

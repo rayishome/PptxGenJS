@@ -1757,13 +1757,19 @@ export function makeTagXml (config?): string {
 	const binderChartObject = config?.BinderChartObject || 'Info';
 	const binderChartName = config?.BinderChartName || 'ChartName';
 	const binderChartID = config?.BinderChartID || 'ID';
-	return `<p:tagLst xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+	const tabBinderInfo = config?.TabBinderInfo || '{DatasetID: DatasetID, GroupID: GroupID}';
+	return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+		<p:tagLst 
+			xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+		 	xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
 		<p:tag name="BINDERID" val="${binderId}" />
 		<p:tag name="BINDERTABID" val="${binderTabID}" />
 		<p:tag name="BINDERTABNAME" val="${binderTabName}" />
 		<p:tag name="BINDERCHARTNAME" val="${binderChartName}" />
-		<p:tag name="BINDERCHARTOBJECT" val="${binderChartObject}" />
+		<p:tag name="BINDERCHARTOBJECT" val='${binderChartObject}' />
 		<p:tag name="CHARTIDENTIFIER" val="${binderChartID}" />
+		<p:tag name="BINDERCHARTID" val="${binderChartID}" />
+		<p:tag name="TABBINDERINFO" val='${tabBinderInfo}' />
 	</p:tagLst>`
 }
 
