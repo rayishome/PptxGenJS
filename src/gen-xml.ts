@@ -666,7 +666,7 @@ function slideObjectToXml (slide: PresSlide | SlideLayout): string {
 				strSlideXml += `   <p:cNvPr id="${idx + 2}" name="${slideItemObj.options.objectName}" descr="${encodeXmlEntities(slideItemObj.options.altText || '')}"/>`
 				strSlideXml += '   <p:cNvGraphicFramePr/>'
 				strSlideXml += `   <p:nvPr>${genXmlPlaceholder(placeholderObj)}`
-				strSlideXml += `   <p:nvPr><p:custDataLst><p:tags r:id="rId${slide?._rId}_${idx}"/></p:custDataLst></p:nvPr>`
+				strSlideXml += `<p:custDataLst><p:tags r:id="rId${slide?._rId}_${idx}"/></p:custDataLst>`
 				strSlideXml += `</p:nvPr>`
 				strSlideXml += ' </p:nvGraphicFramePr>'
 				strSlideXml += ` <p:xfrm><a:off x="${x}" y="${y}"/><a:ext cx="${cx}" cy="${cy}"/></p:xfrm>`

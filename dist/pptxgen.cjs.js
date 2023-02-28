@@ -1,4 +1,4 @@
-/* PptxGenJS 3.12.0-beta @ 2023-02-16T15:31:46.738Z */
+/* PptxGenJS 3.12.0-beta @ 2023-02-28T16:05:04.059Z */
 'use strict';
 
 var JSZip = require('jszip');
@@ -2171,7 +2171,7 @@ function slideObjectToXml(slide) {
                 strSlideXml += "   <p:cNvPr id=\"".concat(idx + 2, "\" name=\"").concat(slideItemObj.options.objectName, "\" descr=\"").concat(encodeXmlEntities(slideItemObj.options.altText || ''), "\"/>");
                 strSlideXml += '   <p:cNvGraphicFramePr/>';
                 strSlideXml += "   <p:nvPr>".concat(genXmlPlaceholder(placeholderObj));
-                strSlideXml += "   <p:nvPr><p:custDataLst><p:tags r:id=\"rId".concat(slide === null || slide === void 0 ? void 0 : slide._rId, "_").concat(idx, "\"/></p:custDataLst></p:nvPr>");
+                strSlideXml += "<p:custDataLst><p:tags r:id=\"rId".concat(slide === null || slide === void 0 ? void 0 : slide._rId, "_").concat(idx, "\"/></p:custDataLst>");
                 strSlideXml += "</p:nvPr>";
                 strSlideXml += ' </p:nvGraphicFramePr>';
                 strSlideXml += " <p:xfrm><a:off x=\"".concat(x, "\" y=\"").concat(y, "\"/><a:ext cx=\"").concat(cx, "\" cy=\"").concat(cy, "\"/></p:xfrm>");
