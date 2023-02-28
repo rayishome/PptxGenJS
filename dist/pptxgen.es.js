@@ -1,4 +1,4 @@
-/* PptxGenJS 3.12.0-beta @ 2023-02-28T16:05:04.062Z */
+/* PptxGenJS 3.12.0-beta @ 2023-02-28T19:38:59.244Z */
 import JSZip from 'jszip';
 
 /*! *****************************************************************************
@@ -1717,7 +1717,7 @@ function slideObjectToXml(slide) {
                 strXml = "<p:graphicFrame><p:nvGraphicFramePr><p:cNvPr id=\"".concat(intTableNum * slide._slideNum + 1, "\" name=\"").concat(slideItemObj.options.objectName, "\"/>");
                 strXml +=
                     '<p:cNvGraphicFramePr><a:graphicFrameLocks noGrp="1"/></p:cNvGraphicFramePr>' +
-                        '  <p:nvPr><p:extLst><p:ext uri="{D42A27DB-BD31-4B8C-83A1-F6EECF244321}"><p14:modId xmlns:p14="http://schemas.microsoft.com/office/powerpoint/2010/main" val="1579011935"/></p:ext></p:extLst></p:nvPr>' +
+                        "<p:nvPr><p:custDataLst><p:tags r:id=\"rId".concat(slide === null || slide === void 0 ? void 0 : slide._rId, "_").concat(idx, "\"/></p:custDataLst><p:extLst><p:ext uri=\"{D42A27DB-BD31-4B8C-83A1-F6EECF244321}\"><p14:modId xmlns:p14=\"http://schemas.microsoft.com/office/powerpoint/2010/main\" val=\"1579011935\"/></p:ext></p:extLst></p:nvPr>") +
                         '</p:nvGraphicFramePr>';
                 strXml += "<p:xfrm><a:off x=\"".concat(x || (x === 0 ? 0 : EMU), "\" y=\"").concat(y || (y === 0 ? 0 : EMU), "\"/><a:ext cx=\"").concat(cx || (cx === 0 ? 0 : EMU), "\" cy=\"").concat(cy || EMU, "\"/></p:xfrm>");
                 strXml += '<a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/table"><a:tbl><a:tblPr/>';
@@ -1913,6 +1913,7 @@ function slideObjectToXml(slide) {
                 });
                 // STEP 5: Complete table
                 strXml += '      </a:tbl>';
+                strXml += "<p:nvPr><p:custDataLst><p:tags r:id=\"rId".concat(slide === null || slide === void 0 ? void 0 : slide._rId, "_").concat(idx, "\"/></p:custDataLst></p:nvPr>");
                 strXml += '    </a:graphicData>';
                 strXml += '  </a:graphic>';
                 strXml += '</p:graphicFrame>';
@@ -3139,11 +3140,10 @@ function makeTagXml(config) {
     var binderId = (config === null || config === void 0 ? void 0 : config.BinderID) || 'binderId';
     var binderTabID = (config === null || config === void 0 ? void 0 : config.BinderTabID) || 'TabId';
     var binderTabName = (config === null || config === void 0 ? void 0 : config.BinderTabName) || 'TabName';
-    var binderChartObject = (config === null || config === void 0 ? void 0 : config.BinderChartObject) || 'Info';
     var binderChartName = (config === null || config === void 0 ? void 0 : config.BinderChartName) || 'ChartName';
     var binderChartID = (config === null || config === void 0 ? void 0 : config.BinderChartID) || 'ID';
     var tabBinderInfo = (config === null || config === void 0 ? void 0 : config.TabBinderInfo) || '{DatasetID: DatasetID, GroupID: GroupID}';
-    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n\t\t<p:tagLst \n\t\t\txmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"\n\t\t \txmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\">\n\t\t<p:tag name=\"BINDERID\" val=\"".concat(binderId, "\" />\n\t\t<p:tag name=\"BINDERTABID\" val=\"").concat(binderTabID, "\" />\n\t\t<p:tag name=\"BINDERTABNAME\" val=\"").concat(binderTabName, "\" />\n\t\t<p:tag name=\"BINDERCHARTNAME\" val=\"").concat(binderChartName, "\" />\n\t\t<p:tag name=\"BINDERCHARTOBJECT\" val='").concat(binderChartObject, "' />\n\t\t<p:tag name=\"CHARTIDENTIFIER\" val=\"").concat(binderChartID, "\" />\n\t\t<p:tag name=\"BINDERCHARTID\" val=\"").concat(binderChartID, "\" />\n\t\t<p:tag name=\"TABBINDERINFO\" val='").concat(tabBinderInfo, "' />\n\t</p:tagLst>");
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n\t\t<p:tagLst \n\t\t\txmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"\n\t\t \txmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\">\n\t\t<p:tag name=\"BINDERID\" val=\"".concat(binderId, "\" />\n\t\t<p:tag name=\"BINDERTABID\" val=\"").concat(binderTabID, "\" />\n\t\t<p:tag name=\"BINDERTABNAME\" val=\"").concat(binderTabName, "\" />\n\t\t<p:tag name=\"BINDERCHARTNAME\" val=\"").concat(binderChartName, "\" />\n\t\t<p:tag name=\"BINDERCHARTID\" val=\"").concat(binderChartID, "\" />\n\t\t<p:tag name=\"TABBINDERINFO\" val='").concat(tabBinderInfo, "' />\n\t\t<p:tag name=\"TABCREATEDATE\" val='").concat(config === null || config === void 0 ? void 0 : config.TabCreateDate, "' />\n\t\t<p:tag name=\"TABLASTUPDATEDATE\" val='").concat(config === null || config === void 0 ? void 0 : config.TabLastUpdateDate, "' />\n\t\t<p:tag name=\"TABSORTORDER\" val='").concat(config === null || config === void 0 ? void 0 : config.TabSortOrder, "' />\n\t\t<p:tag name=\"TABDATASETID\" val='").concat(config === null || config === void 0 ? void 0 : config.TabDatasetId, "' />\n\t</p:tagLst>");
 }
 /**
  * Creates `ppt/theme/theme1.xml`

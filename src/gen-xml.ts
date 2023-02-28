@@ -175,7 +175,7 @@ function slideObjectToXml (slide: PresSlide | SlideLayout): string {
 				strXml = `<p:graphicFrame><p:nvGraphicFramePr><p:cNvPr id="${intTableNum * slide._slideNum + 1}" name="${slideItemObj.options.objectName}"/>`
 				strXml +=
 					'<p:cNvGraphicFramePr><a:graphicFrameLocks noGrp="1"/></p:cNvGraphicFramePr>' +
-					'  <p:nvPr><p:extLst><p:ext uri="{D42A27DB-BD31-4B8C-83A1-F6EECF244321}"><p14:modId xmlns:p14="http://schemas.microsoft.com/office/powerpoint/2010/main" val="1579011935"/></p:ext></p:extLst></p:nvPr>' +
+					`<p:nvPr><p:custDataLst><p:tags r:id="rId${slide?._rId}_${idx}"/></p:custDataLst><p:extLst><p:ext uri="{D42A27DB-BD31-4B8C-83A1-F6EECF244321}"><p14:modId xmlns:p14="http://schemas.microsoft.com/office/powerpoint/2010/main" val="1579011935"/></p:ext></p:extLst></p:nvPr>` +
 					'</p:nvGraphicFramePr>'
 				strXml += `<p:xfrm><a:off x="${x || (x === 0 ? 0 : EMU)}" y="${y || (y === 0 ? 0 : EMU)}"/><a:ext cx="${cx || (cx === 0 ? 0 : EMU)}" cy="${
 					cy || EMU
@@ -375,6 +375,7 @@ function slideObjectToXml (slide: PresSlide | SlideLayout): string {
 
 				// STEP 5: Complete table
 				strXml += '      </a:tbl>'
+				strXml += `<p:nvPr><p:custDataLst><p:tags r:id="rId${slide?._rId}_${idx}"/></p:custDataLst></p:nvPr>`
 				strXml += '    </a:graphicData>'
 				strXml += '  </a:graphic>'
 				strXml += '</p:graphicFrame>'
@@ -1754,7 +1755,6 @@ export function makeTagXml (config?): string {
 	const binderId = config?.BinderID || 'binderId';
 	const binderTabID = config?.BinderTabID || 'TabId';
 	const binderTabName = config?.BinderTabName || 'TabName';
-	const binderChartObject = config?.BinderChartObject || 'Info';
 	const binderChartName = config?.BinderChartName || 'ChartName';
 	const binderChartID = config?.BinderChartID || 'ID';
 	const tabBinderInfo = config?.TabBinderInfo || '{DatasetID: DatasetID, GroupID: GroupID}';
@@ -1766,10 +1766,12 @@ export function makeTagXml (config?): string {
 		<p:tag name="BINDERTABID" val="${binderTabID}" />
 		<p:tag name="BINDERTABNAME" val="${binderTabName}" />
 		<p:tag name="BINDERCHARTNAME" val="${binderChartName}" />
-		<p:tag name="BINDERCHARTOBJECT" val='${binderChartObject}' />
-		<p:tag name="CHARTIDENTIFIER" val="${binderChartID}" />
 		<p:tag name="BINDERCHARTID" val="${binderChartID}" />
 		<p:tag name="TABBINDERINFO" val='${tabBinderInfo}' />
+		<p:tag name="TABCREATEDATE" val='${config?.TabCreateDate}' />
+		<p:tag name="TABLASTUPDATEDATE" val='${config?.TabLastUpdateDate}' />
+		<p:tag name="TABSORTORDER" val='${config?.TabSortOrder}' />
+		<p:tag name="TABDATASETID" val='${config?.TabDatasetId}' />
 	</p:tagLst>`
 }
 
