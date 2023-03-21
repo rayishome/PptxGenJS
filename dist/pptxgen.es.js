@@ -1,4 +1,4 @@
-/* PptxGenJS 3.12.0-beta @ 2023-02-28T19:38:59.244Z */
+/* PptxGenJS 3.12.0-beta @ 2023-03-21T18:09:28.630Z */
 import JSZip from 'jszip';
 
 /*! *****************************************************************************
@@ -1946,7 +1946,6 @@ function slideObjectToXml(slide) {
                 strSlideXml += '<p:sp>';
                 // B: The addition of the "txBox" attribute is the sole determiner of if an object is a shape or textbox
                 strSlideXml += "<p:nvSpPr><p:cNvPr id=\"".concat(idx + 2, "\" name=\"").concat(slideItemObj.options.objectName, "\">");
-                strSlideXml += "<p:nvPr><p:custDataLst><p:tags r:id=\"rId".concat(slide === null || slide === void 0 ? void 0 : slide._rId, "_").concat(idx, "\"/></p:custDataLst></p:nvPr>");
                 // <Hyperlink>
                 if ((_c = slideItemObj.options.hyperlink) === null || _c === void 0 ? void 0 : _c.url) {
                     strSlideXml += "<a:hlinkClick r:id=\"rId".concat(slideItemObj.options.hyperlink._rId, "\" tooltip=\"").concat(slideItemObj.options.hyperlink.tooltip ? encodeXmlEntities(slideItemObj.options.hyperlink.tooltip) : '', "\"/>");
@@ -1957,7 +1956,9 @@ function slideObjectToXml(slide) {
                 // </Hyperlink>
                 strSlideXml += '</p:cNvPr>';
                 strSlideXml += '<p:cNvSpPr' + (((_e = slideItemObj.options) === null || _e === void 0 ? void 0 : _e.isTextBox) ? ' txBox="1"/>' : '/>');
-                strSlideXml += "<p:nvPr>".concat(slideItemObj._type === 'placeholder' ? genXmlPlaceholder(slideItemObj) : genXmlPlaceholder(placeholderObj), "</p:nvPr>");
+                strSlideXml += "<p:nvPr>".concat(slideItemObj._type === 'placeholder' ? genXmlPlaceholder(slideItemObj) : genXmlPlaceholder(placeholderObj));
+                strSlideXml += "<p:custDataLst><p:tags r:id=\"rId".concat(slide === null || slide === void 0 ? void 0 : slide._rId, "_").concat(idx, "\"/></p:custDataLst>");
+                strSlideXml += "</p:nvPr>";
                 strSlideXml += '</p:nvSpPr><p:spPr>';
                 strSlideXml += "<a:xfrm".concat(locationAttr, ">");
                 strSlideXml += "<a:off x=\"".concat(x, "\" y=\"").concat(y, "\"/>");
@@ -3137,13 +3138,20 @@ function getLayoutIdxForSlide(slides, slideLayouts, slideNumber) {
 }
 // XML-GEN: Last 5 functions create root /ppt files
 function makeTagXml(config) {
+    var restInfo;
+    if ((config === null || config === void 0 ? void 0 : config.infoKey) === 'textTag') {
+        restInfo = "\n\t\t\t<p:tag name=\"BINDERCHARTOBJECT\" val=\"".concat((config === null || config === void 0 ? void 0 : config.BinderChartObject) || 'Info', "\" />\n\t\t\t<p:tag name=\"CHARTIDENTIFIER\" val=\"").concat((config === null || config === void 0 ? void 0 : config.ChartIdentifier) || 'Title', "\" />\n\t\t");
+    }
+    else {
+        var binderChartID = (config === null || config === void 0 ? void 0 : config.BinderChartID) || 'ID';
+        var tabBinderInfo = (config === null || config === void 0 ? void 0 : config.TabBinderInfo) || '{DatasetID: DatasetID, GroupID: GroupID}';
+        restInfo = "\n\t\t\t<p:tag name=\"BINDERCHARTID\" val=\"".concat(binderChartID, "\" />\n\t\t\t<p:tag name=\"TABBINDERINFO\" val='").concat(tabBinderInfo, "' />\n\t\t\t<p:tag name=\"TABCREATEDATE\" val='").concat(config === null || config === void 0 ? void 0 : config.TabCreateDate, "' />\n\t\t\t<p:tag name=\"TABLASTUPDATEDATE\" val='").concat(config === null || config === void 0 ? void 0 : config.TabLastUpdateDate, "' />\n\t\t\t<p:tag name=\"TABSORTORDER\" val='").concat(config === null || config === void 0 ? void 0 : config.TabSortOrder, "' />\n\t\t\t<p:tag name=\"TABDATASETID\" val='").concat(config === null || config === void 0 ? void 0 : config.TabDatasetId, "' />");
+    }
     var binderId = (config === null || config === void 0 ? void 0 : config.BinderID) || 'binderId';
     var binderTabID = (config === null || config === void 0 ? void 0 : config.BinderTabID) || 'TabId';
-    var binderTabName = (config === null || config === void 0 ? void 0 : config.BinderTabName) || 'TabName';
     var binderChartName = (config === null || config === void 0 ? void 0 : config.BinderChartName) || 'ChartName';
-    var binderChartID = (config === null || config === void 0 ? void 0 : config.BinderChartID) || 'ID';
-    var tabBinderInfo = (config === null || config === void 0 ? void 0 : config.TabBinderInfo) || '{DatasetID: DatasetID, GroupID: GroupID}';
-    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n\t\t<p:tagLst \n\t\t\txmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"\n\t\t \txmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\">\n\t\t<p:tag name=\"BINDERID\" val=\"".concat(binderId, "\" />\n\t\t<p:tag name=\"BINDERTABID\" val=\"").concat(binderTabID, "\" />\n\t\t<p:tag name=\"BINDERTABNAME\" val=\"").concat(binderTabName, "\" />\n\t\t<p:tag name=\"BINDERCHARTNAME\" val=\"").concat(binderChartName, "\" />\n\t\t<p:tag name=\"BINDERCHARTID\" val=\"").concat(binderChartID, "\" />\n\t\t<p:tag name=\"TABBINDERINFO\" val='").concat(tabBinderInfo, "' />\n\t\t<p:tag name=\"TABCREATEDATE\" val='").concat(config === null || config === void 0 ? void 0 : config.TabCreateDate, "' />\n\t\t<p:tag name=\"TABLASTUPDATEDATE\" val='").concat(config === null || config === void 0 ? void 0 : config.TabLastUpdateDate, "' />\n\t\t<p:tag name=\"TABSORTORDER\" val='").concat(config === null || config === void 0 ? void 0 : config.TabSortOrder, "' />\n\t\t<p:tag name=\"TABDATASETID\" val='").concat(config === null || config === void 0 ? void 0 : config.TabDatasetId, "' />\n\t</p:tagLst>");
+    var binderTabName = (config === null || config === void 0 ? void 0 : config.BinderTabName) || 'TabName';
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n\t\t<p:tagLst \n\t\t\txmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"\n\t\t \txmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\">\n\t\t<p:tag name=\"BINDERID\" val=\"".concat(binderId, "\" />\n\t\t<p:tag name=\"BINDERTABID\" val=\"").concat(binderTabID, "\" />\n\t\t<p:tag name=\"BINDERTABNAME\" val=\"").concat(binderTabName, "\" />\n\t\t<p:tag name=\"BINDERCHARTNAME\" val=\"").concat(binderChartName, "\" />\n\t\t").concat(restInfo, "\n\t</p:tagLst>");
 }
 /**
  * Creates `ppt/theme/theme1.xml`
@@ -6935,6 +6943,7 @@ var PptxGenJS = /** @class */ (function () {
                                                     tagsKeysArray.push(key);
                                                     var infoKey = object._type === 'text' ? 'textTag' : 'chartTag';
                                                     var tagInfo = (_a = object === null || object === void 0 ? void 0 : object.options) === null || _a === void 0 ? void 0 : _a.tagsInfo[infoKey];
+                                                    tagInfo.infoKey = infoKey;
                                                     zip.file("ppt/tags/tag".concat(key, ".xml"), makeTagXml(tagInfo || null));
                                                 }); // add arg to generate tagXml
                                                 zip.file("ppt/slides/slide".concat(idx + 1, ".xml"), makeXmlSlide(slide));

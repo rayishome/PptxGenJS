@@ -411,7 +411,6 @@ function slideObjectToXml (slide: PresSlide | SlideLayout): string {
 
 				// B: The addition of the "txBox" attribute is the sole determiner of if an object is a shape or textbox
 				strSlideXml += `<p:nvSpPr><p:cNvPr id="${idx + 2}" name="${slideItemObj.options.objectName}">`
-        strSlideXml += `<p:nvPr><p:custDataLst><p:tags r:id="rId${slide?._rId}_${idx}"/></p:custDataLst></p:nvPr>`
 				// <Hyperlink>
 				if (slideItemObj.options.hyperlink?.url) {
 					strSlideXml += `<a:hlinkClick r:id="rId${slideItemObj.options.hyperlink._rId}" tooltip="${slideItemObj.options.hyperlink.tooltip ? encodeXmlEntities(slideItemObj.options.hyperlink.tooltip) : ''}"/>`
@@ -422,7 +421,9 @@ function slideObjectToXml (slide: PresSlide | SlideLayout): string {
 				// </Hyperlink>
 				strSlideXml += '</p:cNvPr>'
 				strSlideXml += '<p:cNvSpPr' + (slideItemObj.options?.isTextBox ? ' txBox="1"/>' : '/>')
-				strSlideXml += `<p:nvPr>${slideItemObj._type === 'placeholder' ? genXmlPlaceholder(slideItemObj) : genXmlPlaceholder(placeholderObj)}</p:nvPr>`
+				strSlideXml += `<p:nvPr>${slideItemObj._type === 'placeholder' ? genXmlPlaceholder(slideItemObj) : genXmlPlaceholder(placeholderObj)}`
+				strSlideXml += `<p:custDataLst><p:tags r:id="rId${slide?._rId}_${idx}"/></p:custDataLst>`;
+				strSlideXml += `</p:nvPr>`;
 				strSlideXml += '</p:nvSpPr><p:spPr>'
 				strSlideXml += `<a:xfrm${locationAttr}>`
 				strSlideXml += `<a:off x="${x}" y="${y}"/>`
@@ -1752,12 +1753,29 @@ function getLayoutIdxForSlide (slides: PresSlide[], slideLayouts: SlideLayout[],
 // XML-GEN: Last 5 functions create root /ppt files
 
 export function makeTagXml (config?): string {
+	let restInfo;
+	if(config?.infoKey === 'textTag') {
+		restInfo = `
+			<p:tag name="BINDERCHARTOBJECT" val="${config?.BinderChartObject || 'Info'}" />
+			<p:tag name="CHARTIDENTIFIER" val="${config?.ChartIdentifier || 'Title'}" />
+		`
+	} else {
+		const binderChartID = config?.BinderChartID || 'ID';
+		const tabBinderInfo = config?.TabBinderInfo || '{DatasetID: DatasetID, GroupID: GroupID}';
+
+		restInfo = `
+			<p:tag name="BINDERCHARTID" val="${binderChartID}" />
+			<p:tag name="TABBINDERINFO" val='${tabBinderInfo}' />
+			<p:tag name="TABCREATEDATE" val='${config?.TabCreateDate}' />
+			<p:tag name="TABLASTUPDATEDATE" val='${config?.TabLastUpdateDate}' />
+			<p:tag name="TABSORTORDER" val='${config?.TabSortOrder}' />
+			<p:tag name="TABDATASETID" val='${config?.TabDatasetId}' />`
+	}
 	const binderId = config?.BinderID || 'binderId';
 	const binderTabID = config?.BinderTabID || 'TabId';
-	const binderTabName = config?.BinderTabName || 'TabName';
 	const binderChartName = config?.BinderChartName || 'ChartName';
-	const binderChartID = config?.BinderChartID || 'ID';
-	const tabBinderInfo = config?.TabBinderInfo || '{DatasetID: DatasetID, GroupID: GroupID}';
+	const binderTabName = config?.BinderTabName || 'TabName';
+
 	return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 		<p:tagLst 
 			xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
@@ -1766,12 +1784,7 @@ export function makeTagXml (config?): string {
 		<p:tag name="BINDERTABID" val="${binderTabID}" />
 		<p:tag name="BINDERTABNAME" val="${binderTabName}" />
 		<p:tag name="BINDERCHARTNAME" val="${binderChartName}" />
-		<p:tag name="BINDERCHARTID" val="${binderChartID}" />
-		<p:tag name="TABBINDERINFO" val='${tabBinderInfo}' />
-		<p:tag name="TABCREATEDATE" val='${config?.TabCreateDate}' />
-		<p:tag name="TABLASTUPDATEDATE" val='${config?.TabLastUpdateDate}' />
-		<p:tag name="TABSORTORDER" val='${config?.TabSortOrder}' />
-		<p:tag name="TABDATASETID" val='${config?.TabDatasetId}' />
+		${restInfo}
 	</p:tagLst>`
 }
 

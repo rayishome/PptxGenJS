@@ -521,6 +521,7 @@ export default class PptxGenJS implements IPresentationProps {
 					tagsKeysArray.push(key);
 					const infoKey = object._type === 'text' ? 'textTag' : 'chartTag'
 					const tagInfo = object?.options?.tagsInfo[infoKey];
+					tagInfo.infoKey = infoKey;
 					zip.file(`ppt/tags/tag${key}.xml`, genXml.makeTagXml(tagInfo || null));
 				}) // add arg to generate tagXml
 				zip.file(`ppt/slides/slide${idx + 1}.xml`, genXml.makeXmlSlide(slide))
