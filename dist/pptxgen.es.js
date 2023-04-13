@@ -1,4 +1,4 @@
-/* PptxGenJS 3.12.0-beta @ 2023-03-21T18:09:28.630Z */
+/* PptxGenJS 3.12.0-beta @ 2023-04-13T12:02:41.411Z */
 import JSZip from 'jszip';
 
 /*! *****************************************************************************
@@ -3138,20 +3138,9 @@ function getLayoutIdxForSlide(slides, slideLayouts, slideNumber) {
 }
 // XML-GEN: Last 5 functions create root /ppt files
 function makeTagXml(config) {
-    var restInfo;
-    if ((config === null || config === void 0 ? void 0 : config.infoKey) === 'textTag') {
-        restInfo = "\n\t\t\t<p:tag name=\"BINDERCHARTOBJECT\" val=\"".concat((config === null || config === void 0 ? void 0 : config.BinderChartObject) || 'Info', "\" />\n\t\t\t<p:tag name=\"CHARTIDENTIFIER\" val=\"").concat((config === null || config === void 0 ? void 0 : config.ChartIdentifier) || 'Title', "\" />\n\t\t");
-    }
-    else {
-        var binderChartID = (config === null || config === void 0 ? void 0 : config.BinderChartID) || 'ID';
-        var tabBinderInfo = (config === null || config === void 0 ? void 0 : config.TabBinderInfo) || '{DatasetID: DatasetID, GroupID: GroupID}';
-        restInfo = "\n\t\t\t<p:tag name=\"BINDERCHARTID\" val=\"".concat(binderChartID, "\" />\n\t\t\t<p:tag name=\"TABBINDERINFO\" val='").concat(tabBinderInfo, "' />\n\t\t\t<p:tag name=\"TABCREATEDATE\" val='").concat(config === null || config === void 0 ? void 0 : config.TabCreateDate, "' />\n\t\t\t<p:tag name=\"TABLASTUPDATEDATE\" val='").concat(config === null || config === void 0 ? void 0 : config.TabLastUpdateDate, "' />\n\t\t\t<p:tag name=\"TABSORTORDER\" val='").concat(config === null || config === void 0 ? void 0 : config.TabSortOrder, "' />\n\t\t\t<p:tag name=\"TABDATASETID\" val='").concat(config === null || config === void 0 ? void 0 : config.TabDatasetId, "' />");
-    }
-    var binderId = (config === null || config === void 0 ? void 0 : config.BinderID) || 'binderId';
-    var binderTabID = (config === null || config === void 0 ? void 0 : config.BinderTabID) || 'TabId';
-    var binderChartName = (config === null || config === void 0 ? void 0 : config.BinderChartName) || 'ChartName';
-    var binderTabName = (config === null || config === void 0 ? void 0 : config.BinderTabName) || 'TabName';
-    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n\t\t<p:tagLst \n\t\t\txmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"\n\t\t \txmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\">\n\t\t<p:tag name=\"BINDERID\" val=\"".concat(binderId, "\" />\n\t\t<p:tag name=\"BINDERTABID\" val=\"").concat(binderTabID, "\" />\n\t\t<p:tag name=\"BINDERTABNAME\" val=\"").concat(binderTabName, "\" />\n\t\t<p:tag name=\"BINDERCHARTNAME\" val=\"").concat(binderChartName, "\" />\n\t\t").concat(restInfo, "\n\t</p:tagLst>");
+    var tags = "";
+    Object.keys(config).forEach(function (key) { return tags += " <p:tag name=\"".concat(key, "\" val='").concat(config[key], "' /> "); });
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n\t\t<p:tagLst \n\t\t\txmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"\n\t\t \txmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\">\n\t\t".concat(tags, "\n\t</p:tagLst>");
 }
 /**
  * Creates `ppt/theme/theme1.xml`
@@ -6942,8 +6931,9 @@ var PptxGenJS = /** @class */ (function () {
                                                     var key = "".concat(slide._rId, "_").concat(indexObject);
                                                     tagsKeysArray.push(key);
                                                     var infoKey = object._type === 'text' ? 'textTag' : 'chartTag';
+                                                    if (infoKey === 'textTag' && object.options.y === 5.2)
+                                                        infoKey = 'footnotesTag';
                                                     var tagInfo = (_a = object === null || object === void 0 ? void 0 : object.options) === null || _a === void 0 ? void 0 : _a.tagsInfo[infoKey];
-                                                    tagInfo.infoKey = infoKey;
                                                     zip.file("ppt/tags/tag".concat(key, ".xml"), makeTagXml(tagInfo || null));
                                                 }); // add arg to generate tagXml
                                                 zip.file("ppt/slides/slide".concat(idx + 1, ".xml"), makeXmlSlide(slide));
