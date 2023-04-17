@@ -1202,10 +1202,15 @@ function makeChartType (chartType: CHART_NAME, data: IOptsChartData[], opts: ICh
 								strXml += '            <a:lstStyle/>'
 								strXml += '            <a:p>'
 								strXml += '                <a:pPr>'
-								strXml += '                    <a:defRPr/>'
+								strXml += `        					<a:defRPr b="${opts.dataLabelFontBold ? '1' : '0'}" sz="${Math.round((opts.dataLabelFontSize || DEF_FONT_SIZE) * 100)}" />`
 								strXml += '                </a:pPr>'
 								strXml += '              <a:r>'
-								strXml += '                    <a:rPr lang="' + (opts.lang || 'en-US') + '" dirty="0"/>'
+								strXml += '                 <a:rPr lang="' + (opts.lang || 'en-US') + '" dirty="0">'
+								strXml += '                     <a:solidFill>'
+								strXml +=  `											${createColorElement(opts.dataLabelColor || DEF_FONT_COLOR)}`
+								strXml += '                      </a:solidFill>'
+								strXml += '          						<a:latin typeface="' + (opts.dataLabelFontFace || 'Arial') + '"/>'
+								strXml += '                  </a:rPr>'
 								strXml += '                    <a:t>' + encodeXmlEntities(label) + '</a:t>'
 								strXml += '              </a:r>'
 								// Apply XY values at end of custom label

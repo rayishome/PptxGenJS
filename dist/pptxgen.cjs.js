@@ -1,4 +1,4 @@
-/* PptxGenJS 3.12.0-beta @ 2023-04-13T12:02:41.409Z */
+/* PptxGenJS 3.12.0-beta @ 2023-04-17T14:14:27.842Z */
 'use strict';
 
 var JSZip = require('jszip');
@@ -5690,10 +5690,15 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                                 strXml += '            <a:lstStyle/>';
                                 strXml += '            <a:p>';
                                 strXml += '                <a:pPr>';
-                                strXml += '                    <a:defRPr/>';
+                                strXml += "        \t\t\t\t\t<a:defRPr b=\"".concat(opts.dataLabelFontBold ? '1' : '0', "\" sz=\"").concat(Math.round((opts.dataLabelFontSize || DEF_FONT_SIZE) * 100), "\" />");
                                 strXml += '                </a:pPr>';
                                 strXml += '              <a:r>';
-                                strXml += '                    <a:rPr lang="' + (opts.lang || 'en-US') + '" dirty="0"/>';
+                                strXml += '                 <a:rPr lang="' + (opts.lang || 'en-US') + '" dirty="0">';
+                                strXml += '                     <a:solidFill>';
+                                strXml += "\t\t\t\t\t\t\t\t\t\t\t".concat(createColorElement(opts.dataLabelColor || DEF_FONT_COLOR));
+                                strXml += '                      </a:solidFill>';
+                                strXml += '          						<a:latin typeface="' + (opts.dataLabelFontFace || 'Arial') + '"/>';
+                                strXml += '                  </a:rPr>';
                                 strXml += '                    <a:t>' + encodeXmlEntities(label) + '</a:t>';
                                 strXml += '              </a:r>';
                                 // Apply XY values at end of custom label
