@@ -1,4 +1,4 @@
-/* PptxGenJS 3.12.0-beta @ 2023-04-17T14:14:27.844Z */
+/* PptxGenJS 3.12.0-beta @ 2023-04-20T10:32:12.239Z */
 import JSZip from 'jszip';
 
 /*! *****************************************************************************
@@ -6932,14 +6932,14 @@ var PptxGenJS = /** @class */ (function () {
                                             this.slides.forEach(function (slide, idx) {
                                                 var tagsKeysArray = [];
                                                 slide._slideObjects.forEach(function (object, indexObject) {
-                                                    var _a;
+                                                    var _a, _b;
                                                     var key = "".concat(slide._rId, "_").concat(indexObject);
                                                     tagsKeysArray.push(key);
                                                     var infoKey = object._type === 'text' ? 'textTag' : 'chartTag';
                                                     if (infoKey === 'textTag' && object.options.y === 5.2)
                                                         infoKey = 'footnotesTag';
-                                                    var tagInfo = (_a = object === null || object === void 0 ? void 0 : object.options) === null || _a === void 0 ? void 0 : _a.tagsInfo[infoKey];
-                                                    zip.file("ppt/tags/tag".concat(key, ".xml"), makeTagXml(tagInfo || null));
+                                                    var tagInfo = ((_a = object === null || object === void 0 ? void 0 : object.options) === null || _a === void 0 ? void 0 : _a.tagsInfo) ? (_b = object === null || object === void 0 ? void 0 : object.options) === null || _b === void 0 ? void 0 : _b.tagsInfo[infoKey] : {};
+                                                    zip.file("ppt/tags/tag".concat(key, ".xml"), makeTagXml(tagInfo || {}));
                                                 }); // add arg to generate tagXml
                                                 zip.file("ppt/slides/slide".concat(idx + 1, ".xml"), makeXmlSlide(slide));
                                                 zip.file("ppt/slides/_rels/slide".concat(idx + 1, ".xml.rels"), makeXmlSlideRel(_this.slides, _this.slideLayouts, idx + 1, tagsKeysArray));
