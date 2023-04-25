@@ -1317,6 +1317,7 @@ export interface IChartPropsAxisCat {
 	catAxisLabelRotate?: number
 	catAxisLineColor?: string
 	catAxisLineShow?: boolean
+	catAxisLabelHidden?: boolean
 	catAxisLineSize?: number
 	catAxisLineStyle?: 'solid' | 'dash' | 'dot'
 	catAxisMajorTickMark?: ChartAxisTickMark
@@ -1396,6 +1397,7 @@ export interface IChartPropsAxisVal {
 	valAxisLineColor?: string
 	valAxisLineShow?: boolean
 	valAxisLineSize?: number
+	valAxisLabelHidden?: boolean
 	valAxisLineStyle?: 'solid' | 'dash' | 'dot'
 	/**
 	 * PowerPoint: Format Axis > Axis Options > Logarithmic scale - Base

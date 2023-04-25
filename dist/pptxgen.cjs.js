@@ -1,4 +1,4 @@
-/* PptxGenJS 3.12.0-beta @ 2023-04-20T10:32:12.218Z */
+/* PptxGenJS 3.12.0-beta @ 2023-04-24T16:42:19.840Z */
 'use strict';
 
 var JSZip = require('jszip');
@@ -6240,12 +6240,14 @@ function makeCatAxis(opts, axisId, valAxisId) {
     }
     strXml += '    <a:lstStyle/>';
     strXml += '    <a:p>';
-    strXml += '    <a:pPr>';
-    strXml += "      <a:defRPr sz=\"".concat(Math.round((opts.catAxisLabelFontSize || DEF_FONT_SIZE) * 100), "\" b=\"").concat(opts.catAxisLabelFontBold ? 1 : 0, "\" i=\"").concat(opts.catAxisLabelFontItalic ? 1 : 0, "\" u=\"none\" strike=\"noStrike\">");
-    strXml += '      <a:solidFill>' + createColorElement(opts.catAxisLabelColor || DEF_FONT_COLOR) + '</a:solidFill>';
-    strXml += '      <a:latin typeface="' + (opts.catAxisLabelFontFace || 'Arial') + '"/>';
-    strXml += '   </a:defRPr>';
-    strXml += '  </a:pPr>';
+    if (!opts.catAxisLabelHidden) {
+        strXml += '    <a:pPr>';
+        strXml += "      <a:defRPr sz=\"".concat(Math.round((opts.catAxisLabelFontSize || DEF_FONT_SIZE) * 100), "\" b=\"").concat(opts.catAxisLabelFontBold ? 1 : 0, "\" i=\"").concat(opts.catAxisLabelFontItalic ? 1 : 0, "\" u=\"none\" strike=\"noStrike\">");
+        strXml += '      <a:solidFill>' + createColorElement(opts.catAxisLabelColor || DEF_FONT_COLOR) + '</a:solidFill>';
+        strXml += '      <a:latin typeface="' + (opts.catAxisLabelFontFace || 'Arial') + '"/>';
+        strXml += '   </a:defRPr>';
+        strXml += '  </a:pPr>';
+    }
     strXml += '  <a:endParaRPr lang="' + (opts.lang || 'en-US') + '"/>';
     strXml += '  </a:p>';
     strXml += ' </c:txPr>';
@@ -6348,12 +6350,14 @@ function makeValAxis(opts, valAxisId) {
     strXml += "  <a:bodyPr".concat(opts.valAxisLabelRotate ? (' rot="' + convertRotationDegrees(opts.valAxisLabelRotate).toString() + '"') : '', "/>"); // don't specify rot 0 so we get the auto behavior
     strXml += '  <a:lstStyle/>';
     strXml += '  <a:p>';
-    strXml += '    <a:pPr>';
-    strXml += "      <a:defRPr sz=\"".concat(Math.round((opts.valAxisLabelFontSize || DEF_FONT_SIZE) * 100), "\" b=\"").concat(opts.valAxisLabelFontBold ? 1 : 0, "\" i=\"").concat(opts.valAxisLabelFontItalic ? 1 : 0, "\" u=\"none\" strike=\"noStrike\">");
-    strXml += '        <a:solidFill>' + createColorElement(opts.valAxisLabelColor || DEF_FONT_COLOR) + '</a:solidFill>';
-    strXml += '        <a:latin typeface="' + (opts.valAxisLabelFontFace || 'Arial') + '"/>';
-    strXml += '      </a:defRPr>';
-    strXml += '    </a:pPr>';
+    if (!opts.valAxisLabelHidden) {
+        strXml += '    <a:pPr>';
+        strXml += "      <a:defRPr sz=\"".concat(Math.round((opts.valAxisLabelFontSize || DEF_FONT_SIZE) * 100), "\" b=\"").concat(opts.valAxisLabelFontBold ? 1 : 0, "\" i=\"").concat(opts.valAxisLabelFontItalic ? 1 : 0, "\" u=\"none\" strike=\"noStrike\">");
+        strXml += '        <a:solidFill>' + createColorElement(opts.valAxisLabelColor || DEF_FONT_COLOR) + '</a:solidFill>';
+        strXml += '        <a:latin typeface="' + (opts.valAxisLabelFontFace || 'Arial') + '"/>';
+        strXml += '      </a:defRPr>';
+        strXml += '    </a:pPr>';
+    }
     strXml += '  <a:endParaRPr lang="' + (opts.lang || 'en-US') + '"/>';
     strXml += '  </a:p>';
     strXml += ' </c:txPr>';

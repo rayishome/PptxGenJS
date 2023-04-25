@@ -1784,12 +1784,14 @@ function makeCatAxis (opts: IChartOptsLib, axisId: string, valAxisId: string): s
 	}
 	strXml += '    <a:lstStyle/>'
 	strXml += '    <a:p>'
-	strXml += '    <a:pPr>'
-	strXml += `      <a:defRPr sz="${Math.round((opts.catAxisLabelFontSize || DEF_FONT_SIZE) * 100)}" b="${opts.catAxisLabelFontBold ? 1 : 0}" i="${opts.catAxisLabelFontItalic ? 1 : 0}" u="none" strike="noStrike">`
-	strXml += '      <a:solidFill>' + createColorElement(opts.catAxisLabelColor || DEF_FONT_COLOR) + '</a:solidFill>'
-	strXml += '      <a:latin typeface="' + (opts.catAxisLabelFontFace || 'Arial') + '"/>'
-	strXml += '   </a:defRPr>'
-	strXml += '  </a:pPr>'
+	if(!opts.catAxisLabelHidden) {
+		strXml += '    <a:pPr>'
+		strXml += `      <a:defRPr sz="${Math.round((opts.catAxisLabelFontSize || DEF_FONT_SIZE) * 100)}" b="${opts.catAxisLabelFontBold ? 1 : 0}" i="${opts.catAxisLabelFontItalic ? 1 : 0}" u="none" strike="noStrike">`
+		strXml += '      <a:solidFill>' + createColorElement(opts.catAxisLabelColor || DEF_FONT_COLOR) + '</a:solidFill>'
+		strXml += '      <a:latin typeface="' + (opts.catAxisLabelFontFace || 'Arial') + '"/>'
+		strXml += '   </a:defRPr>'
+		strXml += '  </a:pPr>'
+	}
 	strXml += '  <a:endParaRPr lang="' + (opts.lang || 'en-US') + '"/>'
 	strXml += '  </a:p>'
 	strXml += ' </c:txPr>'
@@ -1884,12 +1886,14 @@ function makeValAxis (opts: IChartOptsLib, valAxisId: string): string {
 	strXml += `  <a:bodyPr${opts.valAxisLabelRotate ? (' rot="' + convertRotationDegrees(opts.valAxisLabelRotate).toString() + '"') : ''}/>` // don't specify rot 0 so we get the auto behavior
 	strXml += '  <a:lstStyle/>'
 	strXml += '  <a:p>'
-	strXml += '    <a:pPr>'
-	strXml += `      <a:defRPr sz="${Math.round((opts.valAxisLabelFontSize || DEF_FONT_SIZE) * 100)}" b="${opts.valAxisLabelFontBold ? 1 : 0}" i="${opts.valAxisLabelFontItalic ? 1 : 0}" u="none" strike="noStrike">`
-	strXml += '        <a:solidFill>' + createColorElement(opts.valAxisLabelColor || DEF_FONT_COLOR) + '</a:solidFill>'
-	strXml += '        <a:latin typeface="' + (opts.valAxisLabelFontFace || 'Arial') + '"/>'
-	strXml += '      </a:defRPr>'
-	strXml += '    </a:pPr>'
+	if(!opts.valAxisLabelHidden) {
+		strXml += '    <a:pPr>'
+		strXml += `      <a:defRPr sz="${Math.round((opts.valAxisLabelFontSize || DEF_FONT_SIZE) * 100)}" b="${opts.valAxisLabelFontBold ? 1 : 0}" i="${opts.valAxisLabelFontItalic ? 1 : 0}" u="none" strike="noStrike">`
+		strXml += '        <a:solidFill>' + createColorElement(opts.valAxisLabelColor || DEF_FONT_COLOR) + '</a:solidFill>'
+		strXml += '        <a:latin typeface="' + (opts.valAxisLabelFontFace || 'Arial') + '"/>'
+		strXml += '      </a:defRPr>'
+		strXml += '    </a:pPr>'
+	}
 	strXml += '  <a:endParaRPr lang="' + (opts.lang || 'en-US') + '"/>'
 	strXml += '  </a:p>'
 	strXml += ' </c:txPr>'
