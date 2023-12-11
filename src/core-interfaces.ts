@@ -128,7 +128,7 @@ export interface HyperlinkProps {
 	 */
 	tooltip?: string
 }
-// used by: chart, text
+// used by: chart, text, image
 export interface ShadowProps {
 	/**
 	 * shadow type
@@ -164,6 +164,10 @@ export interface ShadowProps {
 	 * @example 'FF3399'
 	 */
 	color?: HexColor
+	/**
+	 * whether to rotate shadow with shape
+	 * @default false
+	 */
 	rotateWithShape?: boolean
 }
 // used by: shape, table, text
@@ -388,6 +392,15 @@ export interface TextBaseProps {
 	 */
 	tabStops?: Array<{ position: number, alignment?: 'l' | 'r' | 'ctr' | 'dec' }>
 	/**
+	 * text direction
+	 * `horz` = horizontal
+	 * `vert` = rotate 90^
+	 * `vert270` = rotate 270^
+	 * `wordArtVert` = stacked
+	 * @default 'horz'
+	 */
+	textDirection?: 'horz' | 'vert' | 'vert270' | 'wordArtVert'
+	/**
 	 * Transparency (percent)
 	 * - MS-PPT > Format Shape > Text Options > Text Fill & Outline > Text Fill > Transparency
 	 * - range: 0-100
@@ -445,6 +458,20 @@ export interface ObjectNameProps {
 	 */
 	objectName?: string
 }
+export interface ThemeProps {
+	/**
+	 * Headings font face name
+	 * @example 'Arial Narrow'
+	 * @default 'Calibri Light'
+	 */
+	headFontFace?: string
+	/**
+	 * Body font face name
+	 * @example 'Arial'
+	 * @default 'Calibri'
+	 */
+	bodyFontFace?: string
+}
 
 // image / media ==================================================================================
 export type MediaType = 'audio' | 'online' | 'video'
@@ -485,6 +512,13 @@ export interface ImageProps extends PositionProps, DataOrPathProps, ObjectNamePr
 	 * @default false
 	 */
 	rounding?: boolean
+	/**
+	 * Shadow Props
+	 * - MS-PPT > Format Picture > Shadow
+	 * @example
+	 * { type: 'outer', color: '000000', opacity: 0.5, blur: 20,  offset: 20, angle: 270 }
+	 */
+	shadow?: ShadowProps
 	/**
 	 * Image sizing options
 	 */
@@ -1112,6 +1146,8 @@ export interface OptsDataLabelPosition {
 */
 
 export type ChartAxisTickMark = 'none' | 'inside' | 'outside' | 'cross'
+export type ChartLineCap = 'flat' | 'round' | 'square'
+
 export interface OptsChartData {
 	_dataIndex?: number
 
@@ -1147,6 +1183,12 @@ export interface IOptsChartData extends OptsChartData {
 	labels?: string[][]
 }
 export interface OptsChartGridLine {
+	/**
+	 * MS-PPT > Chart format > Format Major Gridlines > Line > Cap type
+	 * - line cap type
+	 * @default flat
+	 */
+	cap?: ChartLineCap
 	/**
 	 * Gridline color (hex)
 	 * @example 'FF3399'
@@ -1432,6 +1474,17 @@ export interface IChartPropsChartDoughnut {
 	holeSize?: number
 }
 export interface IChartPropsChartLine {
+	/**
+	 * MS-PPT > Chart format > Format Data Series > Line > Cap type
+	 * - line cap type
+	 * @default flat
+	 */
+	lineCap?: ChartLineCap
+	/**
+	 * MS-PPT > Chart format > Format Data Series > Marker Options > Built-in > Type
+	 * - line dash type
+	 * @default solid
+	 */
 	lineDash?: 'dash' | 'dashDot' | 'lgDash' | 'lgDashDot' | 'lgDashDotDot' | 'solid' | 'sysDash' | 'sysDot'
 	/**
 	 * MS-PPT > Chart format > Format Data Series > Marker Options > Built-in > Type
@@ -1809,6 +1862,7 @@ export interface PresentationProps {
 	 */
 	rtlMode: boolean
 	subject: string
+	theme: ThemeProps
 	title: string
 }
 // PRIVATE interface
