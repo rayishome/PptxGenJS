@@ -35,7 +35,7 @@ export function testMainMethods() {
 		margin: [0.5, 0.25, 1.0, 0.25],
 		slideNumber: { x: 0.6, y: 7.0, color: "FFFFFF", fontFace: "Arial", fontSize: 10, align: pptx.AlignH.center },
 		objects: [
-			{ rect: { x: 0.0, y: "90%", w: "100%", h: 0.75, fill: "003b75" } },
+			{ rect: { x: 0.0, y: "90%", w: "100%", h: 0.75, fill: { color: "003b75" } } },
 			{ image: { x: "90%", y: "90%", w: 0.75, h: 0.75, data: IMGBASE64 } },
 			{
 				text: {
@@ -395,7 +395,7 @@ function testMethod_Media(pptx: pptxgen) {
 		type: "video",
 		path: "https://raw.githubusercontent.com/gitbrent/PptxGenJS/master/demos/common/media/sample.avi",
 	});
-	slide.addMedia({ x: 9.4, y: 4.0, w: 3.0, h: 2.25, type: "online", link: "https://www.youtube.com/embed/Dph6ynRVyUc" });
+	slide.addMedia({ x: 9.4, y: 4.0, w: 4.5, h: 2.5, type: "online", link: "https://www.youtube.com/embed/g36-noRtKR4" });
 }
 function testMethod_Shape(pptx: pptxgen) {
 	let slide = pptx.addSlide();
