@@ -1761,7 +1761,11 @@ function getLayoutIdxForSlide (slides: PresSlide[], slideLayouts: SlideLayout[],
 
 export function makeTagXml (config?): string {
 	let tags = ``;
-	Object.keys(config).forEach(key => tags += ` <p:tag name="${key}" val='${config[key]}' /> `)
+	Object.keys(config).forEach(key => {
+		let val = config[key] ? config[key].replace(/"/g, '&quot;') : config[key];
+		val = val ? val.replace(/'/g, '&quot;') : val;
+		tags += ` <p:tag name="${key}" val='${val}' /> `
+	})
 
 	return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 		<p:tagLst 
