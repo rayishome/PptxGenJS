@@ -1,4 +1,4 @@
-/* PptxGenJS 3.13.0-beta.1 @ 2023-12-11T13:38:12.538Z */
+/* PptxGenJS 3.13.0-beta.1 @ 2023-12-12T15:55:25.267Z */
 'use strict';
 
 var JSZip = require('jszip');
@@ -6715,8 +6715,11 @@ function getLayoutIdxForSlide(slides, slideLayouts, slideNumber) {
 function makeTagXml(config) {
     var tags = "";
     Object.keys(config).forEach(function (key) {
-        var val = config[key] ? config[key].replace(/"/g, '&quot;') : config[key];
+        var val = config[key] ? "".concat(config[key]).replace(/"/g, '&quot;') : config[key];
         val = val ? val.replace(/'/g, '&quot;') : val;
+        val = val ? val.replace(/&/g, '&amp;') : val;
+        val = val ? val.replace(/</g, '&lt;') : val;
+        val = val ? val.replace(/>/g, '&gt;') : val;
         tags += " <p:tag name=\"".concat(key, "\" val='").concat(val, "' /> ");
     });
     return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n\t\t<p:tagLst \n\t\t\txmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"\n\t\t \txmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\">\n\t\t".concat(tags, "\n\t</p:tagLst>");
