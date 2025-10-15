@@ -285,6 +285,7 @@ export function addChartDefinition (target: PresSlide, type: CHART_NAME | IChart
 	options.showPercent = options.showPercent || !options.showPercent ? options.showPercent : true
 	options.showTitle = options.showTitle || !options.showTitle ? options.showTitle : false
 	options.showValue = options.showValue || !options.showValue ? options.showValue : false
+	options.showGap = options.showGap || !options.showGap ? options.showGap : false
 	options.showLeaderLines = options.showLeaderLines || !options.showLeaderLines ? options.showLeaderLines : false
 	options.catAxisLineShow = typeof options.catAxisLineShow !== 'undefined' ? options.catAxisLineShow : true
 	options.valAxisLineShow = typeof options.valAxisLineShow !== 'undefined' ? options.valAxisLineShow : true

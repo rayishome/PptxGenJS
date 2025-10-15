@@ -1292,6 +1292,11 @@ export interface IChartPropsBase {
 	 * @default false
 	 */
 	showValue?: boolean
+	/**
+	 * Whether to show gap/spacing when legend is positioned at top
+	 * @default false
+	 */
+	showGap?: boolean
 	subTitles?: IChartPropsTitle[],
 	/**
 	 * 3D Perspecitve

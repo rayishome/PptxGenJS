@@ -1,7 +1,7 @@
-/* PptxGenJS 3.13.0-beta.1 @ 2023-12-12T15:55:25.274Z */
+/* PptxGenJS 3.13.0-beta.1 @ 2025-10-13T21:54:32.495Z */
 import JSZip from 'jszip';
 
-/*! *****************************************************************************
+/******************************************************************************
 Copyright (c) Microsoft Corporation.
 
 Permission to use, copy, modify, and/or distribute this software for any
@@ -43,7 +43,7 @@ function __generator(thisArg, body) {
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
             if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
             if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
@@ -1881,6 +1881,7 @@ function addChartDefinition(target, type, data, opt) {
     options.showPercent = options.showPercent || !options.showPercent ? options.showPercent : true;
     options.showTitle = options.showTitle || !options.showTitle ? options.showTitle : false;
     options.showValue = options.showValue || !options.showValue ? options.showValue : false;
+    options.showGap = options.showGap || !options.showGap ? options.showGap : false;
     options.showLeaderLines = options.showLeaderLines || !options.showLeaderLines ? options.showLeaderLines : false;
     options.catAxisLineShow = typeof options.catAxisLineShow !== 'undefined' ? options.catAxisLineShow : true;
     options.valAxisLineShow = typeof options.valAxisLineShow !== 'undefined' ? options.valAxisLineShow : true;
@@ -3507,6 +3508,20 @@ function makeXmlCharts(rel) {
             strXml += '  <c:y val="' + (rel.opts.layout.y || 0) + '" />';
             strXml += '  <c:w val="' + (rel.opts.layout.w || 1) + '" />';
             strXml += '  <c:h val="' + (rel.opts.layout.h || 1) + '" />';
+            strXml += ' </c:manualLayout>';
+            strXml += '</c:layout>';
+        }
+        else if (rel.opts.showGap) {
+            // Add spacing at top when legend is positioned on top to allow for text insertion
+            strXml += '<c:layout>';
+            strXml += ' <c:manualLayout>';
+            strXml += '  <c:layoutTarget val="inner" />';
+            strXml += '  <c:xMode val="edge" />';
+            strXml += '  <c:yMode val="edge" />';
+            strXml += '  <c:x val="0" />';
+            strXml += '  <c:y val="0.28" />';
+            strXml += '  <c:w val="1" />';
+            strXml += '  <c:h val="0.65" />';
             strXml += ' </c:manualLayout>';
             strXml += '</c:layout>';
         }

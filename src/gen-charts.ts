@@ -609,6 +609,19 @@ export function makeXmlCharts (rel: ISlideRelChart): string {
 			strXml += '  <c:h val="' + (rel.opts.layout.h || 1) + '" />'
 			strXml += ' </c:manualLayout>'
 			strXml += '</c:layout>'
+		} else if (rel.opts.showGap) {
+			// Add spacing at top when legend is positioned on top to allow for text insertion
+			strXml += '<c:layout>'
+			strXml += ' <c:manualLayout>'
+			strXml += '  <c:layoutTarget val="inner" />'
+			strXml += '  <c:xMode val="edge" />'
+			strXml += '  <c:yMode val="edge" />'
+			strXml += '  <c:x val="0" />'
+			strXml += '  <c:y val="0.28" />'
+			strXml += '  <c:w val="1" />'
+			strXml += '  <c:h val="0.65" />'
+			strXml += ' </c:manualLayout>'
+			strXml += '</c:layout>'
 		} else {
 			strXml += '<c:layout/>'
 		}
