@@ -554,6 +554,7 @@ export async function createExcelWorksheet (chartObject: ISlideRelChart, zip: JS
  * @return {string} XML
  */
 export function makeXmlCharts (rel: ISlideRelChart): string {
+
 	let strXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
 	let usesSecondaryValAxis = false
 
